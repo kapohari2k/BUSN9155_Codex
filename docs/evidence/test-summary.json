@@ -1,0 +1,696 @@
+{
+  "scope": "Local production preview under /BUSN9155_Codex/. Integration traffic mocked; no live collection or delivery verification.",
+  "suites": [
+    {
+      "name": "site",
+      "stats": {
+        "startTime": "2026-11-02T10:25:56.396Z",
+        "duration": 29755.986,
+        "expected": 27,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "Home: direct visit, assets, layout and accessibility at 1440px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2416
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "About: direct visit, assets, layout and accessibility at 1440px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1911
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "The audit: direct visit, assets, layout and accessibility at 1440px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 3580
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Coverage checklist: direct visit, assets, layout and accessibility at 1440px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2936
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enquire: direct visit, assets, layout and accessibility at 1440px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 3415
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Home: direct visit, assets, layout and accessibility at 768px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 3114
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "About: direct visit, assets, layout and accessibility at 768px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2512
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "The audit: direct visit, assets, layout and accessibility at 768px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 3295
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Coverage checklist: direct visit, assets, layout and accessibility at 768px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2678
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enquire: direct visit, assets, layout and accessibility at 768px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2735
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Home: direct visit, assets, layout and accessibility at 390px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2721
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "About: direct visit, assets, layout and accessibility at 390px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2477
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "The audit: direct visit, assets, layout and accessibility at 390px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2259
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Coverage checklist: direct visit, assets, layout and accessibility at 390px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2137
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enquire: direct visit, assets, layout and accessibility at 390px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1406
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Home: direct visit, assets, layout and accessibility at 320px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1305
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "About: direct visit, assets, layout and accessibility at 320px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1199
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "The audit: direct visit, assets, layout and accessibility at 320px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1298
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Coverage checklist: direct visit, assets, layout and accessibility at 320px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1285
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Enquire: direct visit, assets, layout and accessibility at 320px",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1295
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "every internal page link and fragment resolves within the deployed base",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1141
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "keyboard skip link, mobile menu, Escape and breakpoint reset",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 620
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "both visitor journeys are navigable",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2359
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "no configuration means no submissions, no analytics and no false success",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1093
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "validation is accessible, specific, and retains answers",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 3102
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "reduced motion, large text and print guide remain usable",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 575
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "content remains available and navigation works without JavaScript",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 591
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "integration",
+      "stats": {
+        "startTime": "2026-11-02T10:25:59.529Z",
+        "duration": 17784.742,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "tests": [
+        {
+          "title": "GA stays unloaded until permission, then sends one safe page view",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2348
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "confirmed acceptance alone shows success and generates one lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2595
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "pending state prevents duplicate submissions",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2272
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "service rejection: answers retained, safe error and no false lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2130
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "rate limit: answers retained, safe error and no false lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2106
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "service outage: answers retained, safe error and no false lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2392
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "missing acceptance: answers retained, safe error and no false lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1809
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "negative acceptance: answers retained, safe error and no false lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1881
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "non-JSON acceptance: answers retained, safe error and no false lead",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1624
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "network failure can be retried without re-entering answers",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1934
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "timeout is distinct and does not assert receipt",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1804
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "validation produces a category, never form contents",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1548
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "CTA, sample and guide events use only approved placement labels",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1671
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "revoking analytics keeps answers and blocks further application events",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 2784
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "analytics remains off if browser storage is unavailable",
+          "tests": [
+            {
+              "status": "expected",
+              "results": [
+                {
+                  "status": "passed",
+                  "durationMs": 1323
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "productionFiles": [
+    {
+      "path": "dist/about.html",
+      "bytes": 7230,
+      "sha256": "c73baf0c8515c7ab16ef2730a435041f7327de969d2988fcce755526f46bfa42"
+    },
+    {
+      "path": "dist/assets/font-license-manrope.txt",
+      "bytes": 4383,
+      "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+    },
+    {
+      "path": "dist/assets/font-license-newsreader.txt",
+      "bytes": 4520,
+      "sha256": "26028ec4e13b650065fa525a09532176f8a668b76ff849ea01c564a7480f91e7"
+    },
+    {
+      "path": "dist/assets/main-B-EJV2gR.css",
+      "bytes": 31137,
+      "sha256": "eea0a2898743deec2d5879f8d4642d45158cdb782d0cd9e41b0a4d36b2280477"
+    },
+    {
+      "path": "dist/assets/main-B_K_0o2h.js",
+      "bytes": 9912,
+      "sha256": "200c76d46f42cc99384ab8330371c6fef547e92cb9d37a132c36cfe31027f14f"
+    },
+    {
+      "path": "dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2",
+      "bytes": 24836,
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+    },
+    {
+      "path": "dist/assets/mark-D4REKx7P.svg",
+      "bytes": 252,
+      "sha256": "5cda981f4e4a3fe7ad34a2b47562dba3478e912c0b1c68d362ef5b705fdc137b"
+    },
+    {
+      "path": "dist/assets/newsreader-latin-wght-italic-Bxi8ein9.woff2",
+      "bytes": 64520,
+      "sha256": "48bc8861b9b2ca9300747cad4fd6a3b4ac3028d364df00bd1b72097baa75e509"
+    },
+    {
+      "path": "dist/assets/newsreader-latin-wght-normal-CCVVNp6i.woff2",
+      "bytes": 58084,
+      "sha256": "62981321d9a3cc7a61a73792729043703fd6112da86e8ec848bb57f088578757"
+    },
+    {
+      "path": "dist/audit.html",
+      "bytes": 12810,
+      "sha256": "358400f6b64684826dba8b28f95c2c7152322915dfa7fd5c05e97ef6cecea77d"
+    },
+    {
+      "path": "dist/coverage-checklist.html",
+      "bytes": 9993,
+      "sha256": "9f82a097b7b7aa53dff5cba8547e17bc06affc00b1bfcfc42bdc6ff6667eff22"
+    },
+    {
+      "path": "dist/enquire.html",
+      "bytes": 9704,
+      "sha256": "86b30bd3b717d8245eb63fcc1e79273ccfbc03c5ae2c6abf1140e6d4261bd5e1"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 9414,
+      "sha256": "ae82cbdff2bba952b131f83ae51dabbd262a36383cba298af9998023c201d49e"
+    },
+    {
+      "path": "dist/robots.txt",
+      "bytes": 88,
+      "sha256": "baaff58ba264c13804f285b0eedfede6fd85f6a35c11b2810affaa048c5568b6"
+    },
+    {
+      "path": "dist/sitemap.xml",
+      "bytes": 494,
+      "sha256": "967feca806ecb745deb2e13ba00334dea06ed26fb8a8bece22eb4033936c5e7c"
+    }
+  ]
+}

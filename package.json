@@ -1,0 +1,28 @@
+{
+  "name": "local-lift",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "test": "playwright test --project=site",
+    "test:integration": "node scripts/integration-test.mjs",
+    "check:dist": "node scripts/check-dist.mjs",
+    "capture": "node scripts/capture-review.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/newsreader": "5.3.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "@types/node": "^24.0.0",
+    "typescript": "~5.9.3",
+    "vite": "8.3.5"
+  }
+}
