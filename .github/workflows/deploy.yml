@@ -34,6 +34,7 @@ jobs:
           VITE_BASE_PATH: /BUSN9155_Codex/
           VITE_SITE_URL: https://kapohari2k.github.io/BUSN9155_Codex/
           VITE_FORMSPREE_ENDPOINT: ${{ vars.VITE_FORMSPREE_ENDPOINT }}
+          VITE_GTM_CONTAINER_ID: GTM-PG38VX8P
           VITE_GA4_MEASUREMENT_ID: ${{ vars.VITE_GA4_MEASUREMENT_ID }}
         run: |
           npm run build

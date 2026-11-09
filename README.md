@@ -41,6 +41,10 @@ base: process.env.VITE_BASE_PATH ?? (command === 'build' ? '/BUSN9155_Codex/' : 
 
 The default output is `dist`. All five pages are explicit build inputs. Content is in HTML, not hidden in a client-side router. Shared navigation, metadata and footer are inserted at build time. Internal links include the project base. Fonts and the SVG favicon use ES module imports and are emitted into `dist/assets` with `assetsInlineLimit: 0`. No external font host is used.
 
+## Analytics update: 9 November 2026
+
+The supplied Google Tag Manager container **GTM-PG38VX8P** is now configured. It loads only after analytics opt-in and takes priority over direct GA4 to avoid duplicate tracking. Follow [GTM setup and verification](docs/gtm-setup.md) to configure/publish the container's GA4 tags. Collection is not yet verified. The direct-GA4 instructions below describe the alternative implementation; explicitly set `VITE_GTM_CONTAINER_ID` empty to use it.
+
 ## Optional configuration
 
 Copy `.env.example` to `.env.local` for local development. Vite embeds `VITE_*` settings in public output: they must **never contain secrets**. Restart development or rebuild after changes. GitHub Actions uses **repository variables**, not your local env file.
@@ -48,6 +52,7 @@ Copy `.env.example` to `.env.local` for local development. Vite embeds `VITE_*` 
 | Setting | Purpose | Empty/default behaviour |
 | --- | --- | --- |
 | `VITE_FORMSPREE_ENDPOINT` | Real Formspree form URL, exactly `https://formspree.io/f/YOUR_ID` | Live submission disabled, clear availability notice, no data sent |
+| `VITE_GTM_CONTAINER_ID` | Google Tag Manager container; takes priority over direct GA4 | Defaults to `GTM-PG38VX8P`; blank disables GTM |
 | `VITE_GA4_MEASUREMENT_ID` | Real GA4 web-stream ID, such as `G-…` | No Google script, analytics requests or consent panel |
 | `VITE_SITE_URL` | Full canonical directory URL ending in `/` | Uses the deployment address above |
 | `VITE_BASE_PATH` | Shell/workflow variable for Vite's base | Build: `/BUSN9155_Codex/`; dev/preview: `/` |
@@ -66,7 +71,7 @@ The form collects required email, business website and review reason; Google pro
 
 ### Enable GA4
 
-Follow the [measurement plan](docs/measurement-plan.md) before adding `VITE_GA4_MEASUREMENT_ID` as a repository variable and rebuilding. GA4 loads only after an explicit analytics opt-in. Automatic form and click tracking must be disabled in GA4 to avoid duplicate or unsafe measurements. `generate_lead` is the recommended primary key event, only after service-confirmed submission.
+Follow the [measurement plan](docs/measurement-plan.md) before adding `VITE_GA4_MEASUREMENT_ID` as a repository variable and rebuilding. Analytics loads only after an explicit analytics opt-in. With GTM enabled, configure the Google tag and GA4 event tags in the container as documented above. Automatic form and click tracking must be disabled in GA4 to avoid duplicate or unsafe measurements. `generate_lead` is the recommended primary key event, only after service-confirmed submission.
 
 ## Publish later, after reviewing the draft
 

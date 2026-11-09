@@ -88,7 +88,7 @@ test('both visitor journeys are navigable', async ({ page }) => {
   await expect(page).toHaveURL(/audit\.html$/);
 });
 
-test('no configuration means no submissions, no analytics and no false success', async ({ page }) => {
+test('no form endpoint or analytics consent means no submissions or tracking', async ({ page }) => {
   const thirdParty: string[] = [];
   page.on('request', request => { if (!request.url().startsWith('http://127.0.0.1:4173/')) thirdParty.push(request.url()); });
   await page.goto('enquire.html?email=private@example.com');
@@ -100,7 +100,7 @@ test('no configuration means no submissions, no analytics and no false success',
   await expect(page.getByRole('status')).toContainText('Nothing has been sent');
   await expect(page.locator('#form-success')).toBeHidden();
   await expect(page.locator('#reason')).toHaveValue('Please review service inclusions.');
-  await expect(page.locator('.analytics-banner')).toHaveCount(0);
+  await expect(page.locator('.analytics-banner')).toBeVisible();
   expect(thirdParty).toEqual([]);
 });
 
@@ -120,6 +120,42 @@ test('validation is accessible, specific, and retains answers', async ({ page })
   await expect(page.locator('#email')).toHaveAttribute('aria-invalid','true');
   const result = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   expect(result.violations).toEqual([]);
+});
+
+test('GTM loads once after consent and receives safe events without direct GA4', async ({ page }) => {
+  const requests: string[] = [];
+  await page.route('https://**/*', route => {
+    requests.push(route.request().url());
+    return route.fulfill({status:200,contentType:'text/javascript',body:'/* isolated GTM stub */'});
+  });
+  await page.goto('enquire.html?email=private@example.com#information-use');
+  expect(requests).toEqual([]);
+  await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
+  await expect.poll(()=>requests.length).toBe(1);
+  expect(requests).toEqual(['https://www.googletagmanager.com/gtm.js?id=GTM-PG38VX8P']);
+  const events = () => page.evaluate(() => (window.dataLayer || []).filter(item => typeof item === 'object' && item !== null && 'event' in item) as Record<string,unknown>[]);
+  expect((await events()).filter(e=>e.event==='gtm.js')).toHaveLength(1);
+  expect((await events()).filter(e=>e.event==='page_view')).toEqual([expect.objectContaining({page_location:'https://kapohari2k.github.io/BUSN9155_Codex/enquire.html',page_referrer:''})]);
+  await page.locator('#email').fill('private-invalid-value');
+  await page.getByRole('button',{name:'Send enquiry'}).click();
+  expect((await events()).filter(e=>e.event==='form_start')).toHaveLength(1);
+  expect((await events()).filter(e=>e.event==='form_error')).toEqual([expect.objectContaining({error_category:'validation'})]);
+  expect(JSON.stringify(await events())).not.toContain('private');
+  await page.getByRole('button',{name:'Analytics choices',exact:true}).click();
+  await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
+  expect(requests).toHaveLength(1);
+  expect((await events()).filter(e=>e.event==='page_view')).toHaveLength(1);
+});
+
+test('declining GTM prevents script loading on this page and the next', async ({ page }) => {
+  const requests: string[] = [];
+  await page.route('https://**/*',route=>{requests.push(route.request().url());return route.abort();});
+  await page.goto('./');
+  await page.getByRole('button',{name:'Continue without analytics'}).click();
+  await page.goto('about.html');
+  await expect(page.locator('.analytics-banner')).toBeHidden();
+  expect(requests).toEqual([]);
+  expect(await page.evaluate(()=>window.dataLayer)).toBeUndefined();
 });
 
 test('reduced motion, large text and print guide remain usable', async ({ page }) => {

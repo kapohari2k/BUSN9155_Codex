@@ -5,7 +5,9 @@ declare global {
   interface Window { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void; }
 }
 const id = import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || '';
-const configured = /^G-[A-Z0-9]{6,15}$/.test(id);
+const containerId = (import.meta.env.VITE_GTM_CONTAINER_ID ?? 'GTM-PG38VX8P').trim();
+const useGtm = /^GTM-[A-Z0-9]+$/.test(containerId);
+const configured = useGtm || /^G-[A-Z0-9]{6,15}$/.test(id);
 const storageKey = 'local-lift-analytics';
 let enabled = false;
 let started = false;
@@ -27,6 +29,10 @@ function startAnalytics(): void {
   const locationWithoutFormData = safePageLocation();
   // Set safe context before loading Google's library. Never read form contents here.
   window.gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+  if (useGtm) {
+    // Standard GTM startup event. Consent is queued before loading the container.
+    window.dataLayer!.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+  } else {
   window.gtag('js', new Date());
   window.gtag('config', id, {
     send_page_view: false,
@@ -35,17 +41,30 @@ function startAnalytics(): void {
     page_location: locationWithoutFormData,
     page_referrer: '',
   });
+  }
   const script = document.createElement('script');
   script.async = true;
   script.referrerPolicy = 'no-referrer';
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+  script.src = useGtm
+    ? `https://www.googletagmanager.com/gtm.js?id=${containerId}`
+    : `https://www.googletagmanager.com/gtag/js?id=${id}`;
   document.head.append(script);
-  window.gtag('event', 'page_view', { page_location: locationWithoutFormData, page_referrer: '', page_title: document.title });
+  sendEvent('page_view', { page_location: locationWithoutFormData, page_referrer: '', page_title: document.title });
+}
+
+function sendEvent(name: string, parameters: Record<string, string>): void {
+  if (useGtm) {
+    window.dataLayer!.push({
+      event: name, page_location: safePageLocation(), page_referrer: '', page_title: document.title,
+      // Clear event-specific fields so GTM cannot reuse values from a previous event.
+      placement: undefined, error_category: undefined, ...parameters,
+    });
+  } else window.gtag?.('event', name, parameters);
 }
 
 export function track(name: EventName, parameters: { placement?: SafeLabel; error_category?: ErrorCategory } = {}): void {
   if (!enabled || !configured) return;
-  window.gtag?.('event', name, parameters);
+  sendEvent(name, parameters);
 }
 
 export function initAnalytics(): void {
@@ -77,7 +96,7 @@ export function initAnalytics(): void {
       else if (started) {
         (window as unknown as Record<string, unknown>)[`ga-disable-${id}`] = true;
         window.gtag?.('consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied' });
-        document.querySelector<HTMLScriptElement>('script[src^="https://www.googletagmanager.com/gtag/js"]')?.remove();
+        document.querySelector<HTMLScriptElement>('script[src^="https://www.googletagmanager.com/"]')?.remove();
         // Delete first-party GA cookies available to this origin. Future pages do not load GA.
         document.cookie.split(';').forEach(cookie => {
           const name = cookie.split('=')[0].trim();

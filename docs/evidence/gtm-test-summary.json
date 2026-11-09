@@ -1,0 +1,27 @@
+{
+  "scope": "9 November GTM integration: local Chromium; external Google scripts mocked. Not live GA4 verification.",
+  "suites": [
+    {
+      "name": "site",
+      "stats": {
+        "startTime": "2026-11-09T08:16:30.952Z",
+        "duration": 29646.293,
+        "expected": 29,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "name": "integration",
+      "stats": {
+        "startTime": "2026-11-09T08:16:32.088Z",
+        "duration": 15781.632,
+        "expected": 15,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ]
+}

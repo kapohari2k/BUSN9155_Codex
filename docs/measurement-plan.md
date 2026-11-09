@@ -1,10 +1,14 @@
 # Local Lift measurement plan
 
+## Current integration: 9 November 2026
+
+The website now uses user-supplied GTM container `GTM-PG38VX8P`, after consent. See [GTM configuration and verification](gtm-setup.md). The event table below still applies; events now enter GTM as data layer objects. Direct GA4 configuration details describe the alternative mode, selected only when GTM is explicitly disabled. Container tags, publication and real GA4 collection remain unverified.
+
 ## Objective and boundaries
 
 Help a suitable Perth residential cleaning business owner understand the review, inspect a sample, assess fit and enquire. The independent checklist journey is also useful; a visitor who solves a simple update without enquiring is not automatically a failed visit.
 
-The analytics layer is implemented but **disabled until a real GA4 web-stream measurement ID is supplied and the visitor opts in**. No GA4 property was created or connected during this draft. Local mocked event checks are not collection evidence.
+The analytics layer is implemented but **gated by visitor opt-in; the configured GTM container must contain published GA4 tags for collection**. No GA4 property was created or connected during this draft. Local mocked event checks are not collection evidence.
 
 ## Event specification
 
