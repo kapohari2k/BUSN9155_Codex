@@ -10,6 +10,10 @@
   scroll-margin-block-start: 0;
 }
 
+.enquiry-layout .form-panel:focus-visible {
+  outline: none;
+}
+
 .enquiry-layout .form-panel:focus-visible h1,
 .enquiry-layout #information-use:focus-visible {
   outline: 2px solid var(--ink);

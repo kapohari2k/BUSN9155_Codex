@@ -109,6 +109,8 @@ test('keyboard Enquire targets the form panel, then the first field, including f
   await enquire.focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#enquiry-form')).toBeFocused();
+  await expect(page.locator('#enquiry-heading')).toHaveCSS('outline-width', '2px');
+  await expect(page.locator('#enquiry-form')).toHaveCSS('outline-style', 'none');
   await expect(page.locator('#email')).toBeInViewport();
   await page.keyboard.press('Tab');
   await expect(page.locator('#email')).toBeFocused();
