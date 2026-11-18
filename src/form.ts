@@ -6,6 +6,8 @@ const rawEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT?.trim() || '';
 const endpoint = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/.test(rawEndpoint) ? rawEndpoint : '';
 const fieldNames = ['email', 'website', 'reason', 'profile'] as const;
 type FieldName = typeof fieldNames[number];
+const inlineFields = ['email', 'website', 'profile'] as const;
+type InlineField = typeof inlineFields[number];
 
 const labels: Record<FieldName, string> = {
   email: 'Email',
@@ -53,6 +55,7 @@ export function initForm(): void {
     profile: form.elements.namedItem('profile') as HTMLInputElement,
   };
   const errors = new Map<FieldName, string>();
+  const editedFields = new Set<FieldName>();
   let pending = false;
   let complete = false;
   let started = false;
@@ -70,16 +73,19 @@ export function initForm(): void {
   function validate(name: FieldName): string {
     const value = fields[name].value.trim();
     switch (name) {
-      case 'email':
+      case 'email': {
         if (!value) return 'Enter your email address so we can reply.';
-        return fields.email.validity.typeMismatch ? 'Enter a valid email address, such as name@example.com.au.' : '';
+        const domain = value.split('@')[1];
+        return fields.email.validity.typeMismatch || !domain?.includes('.')
+          ? 'Enter a valid email address like name@example.com.au.' : '';
+      }
       case 'website':
         if (!value) return 'Enter your business website address.';
-        return normaliseWebAddress(value) ? '' : 'Use a domain such as example.com.au or a link starting with https:// or http://.';
+        return normaliseWebAddress(value) ? '' : 'Use an HTTP(S) link or a domain like example.com.au.';
       case 'reason':
         return value ? '' : 'Tell us what you would like reviewed.';
       case 'profile':
-        return !value || normaliseWebAddress(value) ? '' : 'Enter a public listing link such as maps.app.goo.gl/example, or leave this field blank.';
+        return !value || normaliseWebAddress(value) ? '' : 'Enter a public web link or leave this blank.';
     }
   }
 
@@ -121,16 +127,29 @@ export function initForm(): void {
     summary.append(intro, list);
   }
 
+  function validateOnExit(name: InlineField): void {
+    if (editedFields.has(name) && setFieldError(name, validate(name)) && !summary.hidden) updateSummary();
+  }
+
+  for (const name of inlineFields) {
+    fields[name].addEventListener('change', () => editedFields.add(name));
+    fields[name].addEventListener('blur', () => validateOnExit(name));
+  }
   for (const name of fieldNames) {
-    if (name !== 'reason') {
-      fields[name].addEventListener('blur', () => {
-        if (setFieldError(name, validate(name)) && !summary.hidden) updateSummary();
-      });
-    }
     fields[name].addEventListener('input', () => {
+      editedFields.add(name);
       if (errors.has(name) && !validate(name) && setFieldError(name, '') && !summary.hidden) updateSummary();
     });
   }
+
+  document.addEventListener('click', event => {
+    // Some browsers keep the input focused on a click outside it.
+    const name = inlineFields.find(field => fields[field] === document.activeElement);
+    const target = event.target;
+    if (!name || !(target instanceof Node) || target === fields[name]) return;
+    if (Array.from(fields[name].labels ?? []).some(label => label.contains(target))) return;
+    validateOnExit(name);
+  }, { capture: true });
 
   const reportFailure = (category: ErrorCategory, message: string): void => {
     status.dataset.state = 'error';

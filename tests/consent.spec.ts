@@ -55,7 +55,7 @@ test('mocked GTM stays silent until consent and stops after cross-tab withdrawal
         if (item[0] === 'consent') {
           allowed = item[2].analytics_storage === 'granted';
         } else if (allowed && item.event && !item.event.startsWith('gtm.')) {
-          const params = new URLSearchParams({ event: item.event, page: item.page_location });
+          const params = new URLSearchParams(Object.entries(item).filter(([, value]) => value !== undefined));
           fetch('https://analytics.google.com/g/collect?' + params, { mode: 'no-cors' }).catch(() => {});
         }
       };
@@ -91,15 +91,16 @@ test('mocked GTM stays silent until consent and stops after cross-tab withdrawal
   await allow(page).click();
   await expect.poll(() => eventCount('page_view')).toBe(1);
   expect(scripts).toEqual(['https://www.googletagmanager.com/gtm.js?id=GTM-PG38VX8P']);
-  expect(transport[0].searchParams.get('page')).toBe('https://kapohari2k.github.io/BUSN9155_Codex/enquire.html');
+  expect(transport[0].searchParams.get('page_location')).toBe('https://kapohari2k.github.io/BUSN9155_Codex/enquire.html');
   await page.locator('#email').fill('synthetic-owner@example.com');
-  await page.locator('#website').fill('example.com');
+  await page.locator('#website').fill('https://example.com/form-answer-marker');
+  await page.locator('#reason').fill('synthetic-reason-marker');
   await expect.poll(() => eventCount('form_start')).toBe(1);
   await page.locator('.nav-enquire').click();
   await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
   await expect.poll(() => eventCount('enquiry_cta_click')).toBe(1);
   expect(eventCount('page_view')).toBe(1);
-  expect(transport.map(url => url.href).join(' ')).not.toContain('synthetic-owner');
+  expect(transport.map(url => url.href).join(' ')).not.toMatch(/synthetic-owner|form-answer-marker|synthetic-reason-marker/);
 
   const second = await context.newPage();
   await second.goto('about.html');

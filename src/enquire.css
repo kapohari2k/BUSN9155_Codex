@@ -2,7 +2,7 @@
   grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
   align-items: start;
   gap: clamp(28px, 6vw, 88px);
-  padding-block: clamp(28px, 5vw, 68px) clamp(48px, 7vw, 88px);
+  padding-block: clamp(20px, 4vw, 56px) clamp(48px, 7vw, 88px);
 }
 
 .enquiry-layout .form-panel {
@@ -10,9 +10,11 @@
   scroll-margin-block-start: 0;
 }
 
-.enquiry-layout .form-panel:focus-visible {
+.enquiry-layout .form-panel:focus-visible h1,
+.enquiry-layout #information-use:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  outline-offset: 5px;
+  border-radius: 2px;
 }
 
 .enquiry-layout :is(.error-summary, .success-panel):focus-visible {
@@ -31,7 +33,7 @@
 }
 
 .enquiry-layout .form-heading > p {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .enquiry-layout .notice {
@@ -46,11 +48,11 @@
 
 .enquiry-layout .required-note {
   color: var(--muted);
-  margin: 0 0 18px;
+  margin: 0 0 12px;
 }
 
 .enquiry-layout .field {
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .enquiry-layout .field > label {
@@ -66,6 +68,11 @@
   font-size: 1rem;
 }
 
+.enquiry-layout .field input[aria-invalid=true] {
+  border-width: 1px;
+  box-shadow: inset 0 0 0 1px #ac332b;
+}
+
 .enquiry-layout .field textarea {
   min-height: 88px;
 }
@@ -76,8 +83,21 @@
   margin-top: 6px;
 }
 
-.enquiry-layout .field-error:empty {
-  margin: 0;
+.field-feedback {
+  display: grid;
+  min-block-size: calc(2 * 1.26rem + 6px);
+}
+
+.field-feedback > p {
+  grid-area: 1 / 1;
+}
+
+.field-feedback > .field-error:not(:empty) ~ .field-hint {
+  visibility: hidden;
+}
+
+.enquiry-layout .enquiry-disclosure {
+  margin: 12px 0 0;
 }
 
 .enquiry-layout .optional {
@@ -94,6 +114,17 @@
   margin-bottom: 16px;
 }
 
+.enquiry-next {
+  color: var(--text);
+  line-height: 1.6;
+  padding-inline-start: 1.3em;
+  margin-bottom: 20px;
+}
+
+.enquiry-next li + li {
+  margin-top: .5em;
+}
+
 .enquiry-layout .information-use {
   margin: 24px 0 0;
 }
@@ -107,9 +138,10 @@
   margin-bottom: 10px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 820px) {
   .enquiry-layout {
     grid-template-columns: 1fr;
+    max-width: 38rem;
   }
 
   .enquiry-layout .form-heading h1 {
@@ -118,5 +150,15 @@
 
   .enquiry-layout .enquiry-aside {
     padding-top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .enquiry-layout .form-panel {
+    padding: 18px;
+  }
+
+  .enquiry-layout #submit-enquiry {
+    width: 100%;
   }
 }

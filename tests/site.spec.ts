@@ -151,7 +151,8 @@ test('validation is accessible, specific, and retains answers', async ({ page })
   await expect(page.locator('#email-error')).toBeVisible();
   await expect(page.locator('#email')).toHaveAttribute('aria-describedby', /email-error/);
   await page.locator('#email').fill('owner@example.com');
-  await expect(page.locator('#email-error')).toBeHidden();
+  await expect(page.locator('#email-error')).toBeEmpty();
+  await expect(page.locator('#email')).not.toHaveAttribute('aria-invalid');
   await page.locator('#email').fill('invalid');
   await page.locator('#website').fill('javascript:alert(1)');
   await page.locator('#website').press('Tab');
@@ -234,3 +235,69 @@ test('content remains available and navigation works without JavaScript', async 
   expect(page.url()).not.toContain('private');
   await context.close();
 });
+
+for (const [device, width, height, hasTouch] of [
+  ['narrow desktop-mode mobile', 320, 740, false],
+  ['touch phone', 390, 844, true],
+  ['touch tablet', 768, 1024, true],
+  ['desktop', 1440, 1000, false],
+] as const) {
+  test(`every enquiry entry point reaches an unobstructed form on ${device}`, async ({ browser, baseURL }) => {
+    test.setTimeout(60_000);
+    const context = await browser.newContext({
+      baseURL, viewport: { width, height }, hasTouch, reducedMotion: 'reduce',
+    });
+    try {
+      const page = await context.newPage();
+      const tap = hasTouch ? 'tap' : 'click';
+      const header = page.locator('.site-header');
+      const heading = page.locator('#enquiry-heading');
+      const assertLanding = async (): Promise<void> => {
+        await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
+        await expect(heading).toBeInViewport({ ratio: 1 });
+        await expect(page.locator('#email')).toBeInViewport({ ratio: 1 });
+        await expect(page.locator('#website')).toBeInViewport({ ratio: 1 });
+        await expect(page.locator('#enquiry-details :is(input, textarea):focus')).toHaveCount(0);
+        const [headerBox, headingBox] = await Promise.all([header.boundingBox(), heading.boundingBox()]);
+        expect(headingBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height);
+      };
+      for (const item of pages) {
+        const path = item.file || './';
+        await page.goto(path);
+        if (width <= 800) await page.locator('.menu-toggle')[tap]();
+        await page.locator('.site-header a[data-event="enquiry"]')[tap]();
+        await assertLanding();
+
+        await page.goto(path);
+        await page.locator('.site-footer a[data-event="enquiry"]')[tap]();
+        await assertLanding();
+
+        await page.goto(path);
+        const content = page.locator('main a[data-event="enquiry"]');
+        const count = await content.count();
+        for (let i = 0; i < count; i++) {
+          await content.nth(i)[tap]();
+          await assertLanding();
+          await page.goBack();
+          await expect(page.locator('main h1')).toHaveText(item.heading);
+        }
+      }
+
+      await page.goto('./');
+      await page.locator('main a[href$="audit.html#sample"]').first()[tap]();
+      await expect(page).toHaveURL(/audit\.html#sample$/);
+      await page.locator('main a[data-event="enquiry"]').first()[tap]();
+      await assertLanding();
+      await page.goBack();
+      await expect(page).toHaveURL(/audit\.html#sample$/);
+      await page.goForward();
+      await assertLanding();
+      await page.reload();
+      await assertLanding();
+      await page.goto('enquire.html#enquiry-form');
+      await assertLanding();
+    } finally {
+      await context.close();
+    }
+  });
+}

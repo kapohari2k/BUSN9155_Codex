@@ -31,6 +31,10 @@
   margin-bottom: 0;
 }
 
+.service-page .page-intro {
+  padding-block: clamp(2rem, 4vw, 3.5rem) clamp(1.6rem, 3.25vw, 2.75rem);
+}
+
 .service-page .page-intro h1 {
   max-width: 22ch;
   text-wrap: balance;
@@ -38,6 +42,15 @@
 
 .service-page .page-intro .lede {
   max-width: 65ch;
+}
+
+.service-page .fit-card .text-link {
+  margin-top: 0.65rem;
+}
+
+.checklist-intro .print-guide {
+  margin-top: 0;
+  text-decoration: underline;
 }
 
 .home-excerpt,
@@ -293,6 +306,33 @@
 }
 
 @media (max-width: 620px) {
+  .service-page .hero {
+    padding-block: 2rem 2.4rem;
+  }
+
+  .service-page .hero h1,
+  .service-page .page-intro h1 {
+    margin-bottom: 1rem;
+  }
+
+  .service-page .hero .button-group,
+  .service-page .page-intro .button-group {
+    margin-top: 1.1rem;
+  }
+
+  .service-page .hero .button {
+    padding-inline: 0.9rem;
+    gap: 0.75rem;
+  }
+
+  .service-page .hero .text-link {
+    gap: 0.625rem;
+  }
+
+  .service-page .page-intro .lede {
+    line-height: 1.65;
+  }
+
   .service-page .section-heading,
   .service-page .split-section,
   .scope-summary,
@@ -314,5 +354,18 @@
 
   .service-page .guide-symbol {
     display: none;
+  }
+
+  .service-page .guide-layout {
+    gap: 1.4rem;
+    padding-top: 2rem;
+  }
+
+  .service-page .guide-aside h2 {
+    margin-bottom: 0.65rem;
+  }
+
+  .service-page .guide-aside p {
+    margin-bottom: 0;
   }
 }

@@ -7,7 +7,7 @@
     <section id="enquiry-form" class="form-panel" tabindex="-1" aria-labelledby="enquiry-heading">
       <div class="form-heading">
         <h1 id="enquiry-heading">Enquire about an audit</h1>
-        <p>Tell us a little about your Perth cleaning business and what you want checked.</p>
+        <p>Share your website and what you’d like checked.</p>
       </div>
       <div id="form-availability" class="notice" hidden>
         <strong>Enquiries are closed</strong>
@@ -15,18 +15,22 @@
       </div>
       <noscript><div class="notice"><strong>This form needs JavaScript to submit.</strong><p>Enable JavaScript to use the form when enquiries are available.</p></div></noscript>
       <form id="enquiry-details" method="post" novalidate>
-        <p class="required-note">Fields marked with an asterisk are required.</p>
+        <p class="required-note">* Required</p>
         <div id="form-errors" class="error-summary" tabindex="-1" role="alert" hidden></div>
         <div class="field">
           <label for="email">Email <span aria-hidden="true">*</span></label>
           <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-describedby="email-error">
-          <p class="field-error" id="email-error" aria-live="polite"></p>
+          <div class="field-feedback">
+            <p class="field-error" id="email-error" aria-live="polite"></p>
+          </div>
         </div>
         <div class="field">
           <label for="website">Business website <span aria-hidden="true">*</span></label>
           <input id="website" name="website" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" maxlength="2048" required aria-describedby="website-hint website-error">
-          <p class="field-hint" id="website-hint">A domain such as example.com.au or a full link.</p>
-          <p class="field-error" id="website-error" aria-live="polite"></p>
+          <div class="field-feedback">
+            <p class="field-error" id="website-error" aria-live="polite"></p>
+            <p class="field-hint" id="website-hint">Example: example.com.au</p>
+          </div>
         </div>
         <div class="field">
           <label for="reason">What would you like reviewed? <span aria-hidden="true">*</span></label>
@@ -37,12 +41,14 @@
         <div class="field">
           <label for="profile">Google Business Profile link <span class="optional">(optional)</span></label>
           <input id="profile" name="profile" type="text" inputmode="url" autocapitalize="none" spellcheck="false" maxlength="2048" aria-describedby="profile-hint profile-error">
-          <p class="field-hint" id="profile-hint">If handy, paste the public link to your listing.</p>
-          <p class="field-error" id="profile-error" aria-live="polite"></p>
+          <div class="field-feedback">
+            <p class="field-error" id="profile-error" aria-live="polite"></p>
+            <p class="field-hint" id="profile-hint">Paste the public link to your listing if you have it.</p>
+          </div>
         </div>
-        <p class="enquiry-disclosure">We use your answers to assess and reply to your enquiry. <a href="#information-use">How we use your information</a></p>
         <button id="submit-enquiry" type="submit" class="button" disabled>Send enquiry <span aria-hidden="true">↗</span></button>
         <p id="form-status" class="form-status" role="status" aria-atomic="true"></p>
+        <p class="enquiry-disclosure"><a href="#information-use">How we use your information</a></p>
       </form>
       <section id="form-success" class="success-panel" tabindex="-1" aria-labelledby="success-heading" hidden>
         <span class="success-mark" aria-hidden="true">✓</span>
@@ -54,11 +60,15 @@
     <aside class="enquiry-aside" aria-labelledby="next-heading">
       <div>
         <h2 id="next-heading">What happens next?</h2>
-        <p>We check if the audit fits your owner-led Perth residential cleaning business, then reply by email to discuss what to review.</p>
-        <p>There’s no payment commitment or need to share account access. If you go ahead, you or your web contact publish the changes you approve.</p>
+        <ol class="enquiry-next">
+          <li>We reply by email about fit and what to review.</li>
+          <li>We agree on scope, timing and fees before work starts.</li>
+          <li>You or your web contact publish any changes you approve.</li>
+        </ol>
+        <p>For owner-led Perth residential cleaning businesses. No payment or account access is needed to enquire.</p>
         <a class="text-link" href="@/audit.html#sample" data-event="sample" data-placement="enquire-aside">See what you would receive <span aria-hidden="true">→</span></a>
       </div>
-      <section id="information-use" class="information-use">
+      <section id="information-use" tabindex="-1" class="information-use">
         <h3>How we use your information</h3>
         <p>When you send the form, Formspree passes your answers to the project owner’s inbox. Leave out passwords and sensitive information.</p>
         <p>Optional analytics measures general site actions if you opt in. It never receives your enquiry answers.</p>

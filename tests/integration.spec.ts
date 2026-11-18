@@ -25,6 +25,123 @@ async function fillForm(page: Page): Promise<void> {
   await page.locator('#reason').fill('Private free text: review inclusions.');
 }
 
+test('edited fields validate on mouse exit while untouched fields stay quiet', async ({ page }) => {
+  await openForm(page);
+  const email = page.locator('#email');
+  const website = page.locator('#website');
+  const emailError = page.locator('#email-error');
+  const websiteError = page.locator('#website-error');
+
+  await email.click();
+  await website.click();
+  await expect(emailError).toBeEmpty();
+  await expect(email).not.toHaveAttribute('aria-invalid');
+  await email.click();
+  await page.keyboard.type('owner-invalid');
+  await expect(emailError).toBeEmpty();
+  const websiteBefore = await website.boundingBox();
+  expect(websiteBefore).not.toBeNull();
+  await website.click();
+  await expect(website).toBeFocused();
+  await expect(emailError).toContainText('Enter a valid email address');
+  expect((await website.boundingBox())?.y).toBe(websiteBefore!.y);
+  await expect(email).toHaveAttribute('aria-describedby', /\bemail-error\b/);
+  await expect(email).toHaveValue('owner-invalid');
+
+  await page.keyboard.type('ftp://example.com');
+  await expect(websiteError).toBeEmpty();
+  const bounds = await website.boundingBox();
+  expect(bounds).not.toBeNull();
+  await page.mouse.click(6, bounds!.y + bounds!.height / 2);
+  await expect(website).not.toBeFocused();
+  await expect(websiteError).toContainText('domain');
+  await expect(website).toHaveAttribute('aria-describedby', /\bwebsite-error\b/);
+  await expect(website).toHaveValue('ftp://example.com');
+  await expect(page.locator('#form-errors')).toBeHidden();
+
+  await email.click();
+  await page.keyboard.press('Control+a');
+  await page.keyboard.type('owner-test@example.com');
+  await expect(emailError).toBeEmpty();
+  await expect(email).toBeFocused();
+  await expect(email).not.toHaveAttribute('aria-invalid');
+  expect(await eventCalls(page, 'form_start')).toHaveLength(1);
+  expect(await eventCalls(page, 'form_error')).toHaveLength(0);
+  expect(await eventCalls(page, 'generate_lead')).toHaveLength(0);
+});
+
+test('a click outside validates edits even when the browser retains input focus', async ({ page }) => {
+  await openForm(page);
+  const email = page.locator('#email');
+  const heading = page.locator('#enquiry-heading');
+  // Model a browser retaining focus on a pointer click on non-focusable text.
+  await heading.evaluate(element => element.addEventListener('mousedown', event => event.preventDefault(), { once: true }));
+  await email.click();
+  await page.keyboard.type('owner@example');
+  await expect(page.locator('#email-error')).toBeEmpty();
+  await heading.click();
+  await expect(email).toBeFocused();
+  await expect(email).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#email-error')).toContainText('Enter a valid email address');
+});
+
+test('Tab keeps its destination when an edited field is empty or corrected', async ({ page }) => {
+  await openForm(page);
+  const email = page.locator('#email');
+  const website = page.locator('#website');
+  const websiteError = page.locator('#website-error');
+  const reason = page.locator('#reason');
+  await email.focus();
+  await page.keyboard.press('Tab');
+  await expect(website).toBeFocused();
+  await expect(page.locator('#email-error')).toBeEmpty();
+  await page.keyboard.type('example');
+  await page.keyboard.press('Control+a');
+  await page.keyboard.press('Backspace');
+  await expect(websiteError).toBeEmpty();
+  await page.keyboard.press('Tab');
+  await expect(reason).toBeFocused();
+  await expect(websiteError).toContainText('Enter your business website address');
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.type('example.com');
+  await expect(website).toBeFocused();
+  await expect(websiteError).toBeEmpty();
+  await expect(website).not.toHaveAttribute('aria-invalid');
+  await page.keyboard.press('Tab');
+  await expect(reason).toBeFocused();
+  await expect(page.locator('#form-errors')).toBeHidden();
+});
+
+test.describe('touch enquiry', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  test('mobile taps validate edited fields and preserve the tapped destination', async ({ page }) => {
+    await openForm(page);
+    const email = page.locator('#email');
+    const website = page.locator('#website');
+    const reason = page.locator('#reason');
+    await expect(email).toHaveAttribute('inputmode', 'email');
+    await expect(website).toHaveAttribute('inputmode', 'url');
+    await email.tap();
+    await website.tap();
+    await expect(page.locator('#email-error')).toBeEmpty();
+    await page.keyboard.type('broken..example.com');
+    await expect(page.locator('#website-error')).toBeEmpty();
+    await reason.tap();
+    await expect(reason).toBeFocused();
+    await expect(website).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#website-error')).toContainText('domain');
+    await website.tap();
+    await page.keyboard.press('Control+a');
+    await page.keyboard.type('www.example.com');
+    await expect(website).toBeFocused();
+    await expect(page.locator('#website-error')).toBeEmpty();
+    await expect(page.locator('#reason-error')).toBeEmpty();
+    await expect(page.locator('#form-errors')).toBeHidden();
+    expect(await eventCalls(page, 'form_start')).toHaveLength(1);
+  });
+});
+
 test('GA stays unloaded until permission, then sends one safe page view', async ({ page }) => {
   let scripts = 0;
   page.on('request', request => { if (request.url().includes('googletagmanager.com')) scripts++; });
@@ -74,7 +191,7 @@ test('pending state prevents duplicate submissions', async ({ page }) => {
     await route.fulfill({status:200,contentType:'application/json',body:'{"ok":true}'});
   });
   await openForm(page); await fillForm(page);
-  await page.getByRole('button',{name:'Send enquiry'}).click();
+  await page.getByRole('button',{name:'Send enquiry'}).dblclick();
   await expect(page.getByRole('button',{name:'Sending enquiry…'})).toBeDisabled();
   await expect(page.locator('#enquiry-details')).toHaveAttribute('aria-busy','true');
   await expect(page.getByRole('status')).toContainText('Please wait');
@@ -203,7 +320,7 @@ for (const [entered, expected] of [
   });
 }
 
-test('a pasted Google profile link is optional and normalised only in the provider payload', async ({ page, context }) => {
+test('clipboard website and profile links are normalised only in the provider payload', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   let payload: Record<string, string> | undefined;
   await page.route(endpoint, async route => {
@@ -212,15 +329,30 @@ test('a pasted Google profile link is optional and normalised only in the provid
   });
   await openForm(page);
   await fillForm(page);
+  const website = page.locator('#website');
   const profile = page.locator('#profile');
-  await page.evaluate(() => navigator.clipboard.writeText('  maps.app.goo.gl/LocalLiftSynthetic  '));
-  await profile.press('Control+V');
-  await profile.press('Tab');
-  await expect(page.locator('#profile-error')).toBeHidden();
+  for (const { field, pasted, error } of [
+    { field: website, pasted: '  www.example.com/synthetic?quote=synthetic#booking  ', error: '#website-error' },
+    { field: profile, pasted: '  maps.app.goo.gl/LocalLiftSynthetic  ', error: '#profile-error' },
+  ]) {
+    await field.fill('ftp://example.com');
+    await field.press('Tab');
+    await expect(field).toHaveAttribute('aria-invalid', 'true');
+    await field.click();
+    await page.keyboard.press('Control+a');
+    await page.evaluate(value => navigator.clipboard.writeText(value), pasted);
+    await page.keyboard.press('Control+v');
+    await expect(field).toBeFocused();
+    await expect(field).toHaveValue(pasted);
+    await expect(page.locator(error)).toBeEmpty();
+  }
   await page.locator('#submit-enquiry').click();
   await expect(page.locator('#form-success')).toBeVisible();
+  expect(payload?.website).toBe('https://www.example.com/synthetic?quote=synthetic#booking');
   expect(payload?.profile).toBe('https://maps.app.goo.gl/LocalLiftSynthetic');
-  expect(JSON.stringify(await dataCalls(page))).not.toContain('LocalLiftSynthetic');
+  expect(await eventCalls(page, 'form_start')).toHaveLength(1);
+  expect(await eventCalls(page, 'generate_lead')).toHaveLength(1);
+  expect(JSON.stringify(await dataCalls(page))).not.toMatch(/LocalLiftSynthetic|quote=synthetic/);
 });
 
 test('malformed or unsupported website and profile links cannot reach the provider or count as a lead', async ({ page }) => {
@@ -242,10 +374,10 @@ test('malformed or unsupported website and profile links cannot reach the provid
   await website.fill('www.example.com');
   await expect(website).not.toHaveAttribute('aria-invalid');
   await profile.fill('mailto:owner@example.com');
-  await profile.press('Tab');
-  await expect(profile).toHaveAttribute('aria-invalid', 'true');
+  await expect(profile).not.toHaveAttribute('aria-invalid');
   await page.locator('#submit-enquiry').click();
   await expect(page.locator('#form-errors')).toBeFocused();
+  await expect(profile).toHaveAttribute('aria-invalid', 'true');
   expect(attempts).toBe(0);
   expect(await eventCalls(page, 'generate_lead')).toHaveLength(0);
   expect(await eventCalls(page, 'form_start')).toHaveLength(1);
