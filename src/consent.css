@@ -1,0 +1,63 @@
+.analytics-banner {
+  background: var(--surface);
+  border-block: 1px solid var(--line);
+}
+
+.analytics-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  padding-block: .65rem;
+}
+
+.analytics-banner h2 {
+  margin-bottom: .15rem;
+  font-family: var(--sans);
+  font-size: .9rem;
+  font-weight: 750;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+.analytics-banner p {
+  margin-bottom: 0;
+  font-size: .8rem;
+  line-height: 1.45;
+}
+
+.analytics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+}
+
+.analytics-actions button {
+  min-height: 44px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  padding: .4rem .7rem;
+  background: var(--white);
+  color: var(--ink);
+  font-size: .78rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.analytics-actions button:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.analytics-actions .analytics-close {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+
+.analytics-preferences {
+  min-height: 44px;
+}

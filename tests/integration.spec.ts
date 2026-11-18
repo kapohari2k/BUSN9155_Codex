@@ -13,14 +13,16 @@ test.beforeEach(async ({ page }) => {
 
 async function openForm(page: Page, allow = true): Promise<void> {
   await page.goto('enquire.html?email=private-query@example.com#information-use');
-  if (allow) await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
+  if (allow) {
+    await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
+    await expect.poll(() => eventCalls(page, 'page_view')).toHaveLength(1);
+  }
   await expect(page.locator('#form-availability')).toBeHidden();
 }
 async function fillForm(page: Page): Promise<void> {
   await page.locator('#email').fill('owner-private@example.com');
   await page.locator('#website').fill('https://example.com/private-path?customer=secret');
   await page.locator('#reason').fill('Private free text: review inclusions.');
-  await page.getByLabel('My web contact',{exact:true}).check();
 }
 
 test('GA stays unloaded until permission, then sends one safe page view', async ({ page }) => {
@@ -52,9 +54,9 @@ test('confirmed acceptance alone shows success and generates one lead', async ({
   await page.getByRole('button',{name:'Send enquiry'}).click();
   await expect(page.locator('#form-success')).toBeVisible();
   await expect(page.locator('#form-success')).toBeFocused();
-  await expect(page.locator('#enquiry-form')).toBeHidden();
+  await expect(page.locator('#enquiry-details')).toBeHidden();
   expect(requests).toBe(1);
-  expect(payload).toEqual({email:'owner-private@example.com',website:'https://example.com/private-path?customer=secret',reason:'Private free text: review inclusions.',publisher:'web_contact'});
+  expect(payload).toEqual({email:'owner-private@example.com',website:'https://example.com/private-path?customer=secret',reason:'Private free text: review inclusions.'});
   expect(await eventCalls(page,'generate_lead')).toHaveLength(1);
   expect(await eventCalls(page,'form_start')).toHaveLength(1);
   expect(await eventCalls(page,'form_error')).toHaveLength(0);
@@ -74,9 +76,9 @@ test('pending state prevents duplicate submissions', async ({ page }) => {
   await openForm(page); await fillForm(page);
   await page.getByRole('button',{name:'Send enquiry'}).click();
   await expect(page.getByRole('button',{name:'Sending enquiry…'})).toBeDisabled();
-  await expect(page.locator('#enquiry-form')).toHaveAttribute('aria-busy','true');
+  await expect(page.locator('#enquiry-details')).toHaveAttribute('aria-busy','true');
   await expect(page.getByRole('status')).toContainText('Please wait');
-  await page.locator('#enquiry-form').evaluate(form => { form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})); });
+  await page.locator('#enquiry-details').evaluate(form => { form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})); });
   expect(requests).toBe(1); expect(await eventCalls(page,'generate_lead')).toHaveLength(0);
   accept!();
   await expect(page.locator('#form-success')).toBeVisible();
@@ -123,7 +125,7 @@ test('timeout is distinct and does not assert receipt', async ({ page }) => {
   await page.route(endpoint, () => { /* Intentionally leave the isolated request pending. */ });
   await openForm(page); await fillForm(page);
   await page.getByRole('button',{name:'Send enquiry'}).click();
-  await expect(page.locator('#enquiry-form')).toHaveAttribute('aria-busy','true');
+  await expect(page.locator('#enquiry-details')).toHaveAttribute('aria-busy','true');
   await page.clock.fastForward(15001);
   await expect(page.getByRole('status')).toContainText('Receipt is uncertain');
   await expect(page.locator('#reason')).toHaveValue('Private free text: review inclusions.');
@@ -176,4 +178,75 @@ test('analytics remains off if browser storage is unavailable', async ({ page })
   await page.getByRole('button',{name:'Continue without analytics'}).click();
   await fillForm(page);
   await expect(page.locator('#reason')).toHaveValue('Private free text: review inclusions.');
+});
+
+for (const [entered, expected] of [
+  ['example.com', 'https://example.com'],
+  ['www.example.com', 'https://www.example.com'],
+  ['http://example.com/cleaning', 'http://example.com/cleaning'],
+  ['  https://example.com/quote?service=home#details  ', 'https://example.com/quote?service=home#details'],
+] as const) {
+  test(`submits a normalised website from ${JSON.stringify(entered)}`, async ({ page }) => {
+    let payload: Record<string, string> | undefined;
+    await page.route(endpoint, async route => {
+      payload = route.request().postDataJSON();
+      await route.fulfill({ json: { ok: true } });
+    });
+    await openForm(page);
+    await fillForm(page);
+    await page.locator('#website').fill(entered);
+    await page.getByRole('button', { name: 'Send enquiry' }).click();
+    await expect(page.locator('#form-success')).toBeVisible();
+    expect(payload?.website).toBe(expected);
+    expect(payload).not.toHaveProperty('profile');
+    expect(await eventCalls(page, 'generate_lead')).toHaveLength(1);
+  });
+}
+
+test('a pasted Google profile link is optional and normalised only in the provider payload', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  let payload: Record<string, string> | undefined;
+  await page.route(endpoint, async route => {
+    payload = route.request().postDataJSON();
+    await route.fulfill({ json: { ok: true } });
+  });
+  await openForm(page);
+  await fillForm(page);
+  const profile = page.locator('#profile');
+  await page.evaluate(() => navigator.clipboard.writeText('  maps.app.goo.gl/LocalLiftSynthetic  '));
+  await profile.press('Control+V');
+  await profile.press('Tab');
+  await expect(page.locator('#profile-error')).toBeHidden();
+  await page.locator('#submit-enquiry').click();
+  await expect(page.locator('#form-success')).toBeVisible();
+  expect(payload?.profile).toBe('https://maps.app.goo.gl/LocalLiftSynthetic');
+  expect(JSON.stringify(await dataCalls(page))).not.toContain('LocalLiftSynthetic');
+});
+
+test('malformed or unsupported website and profile links cannot reach the provider or count as a lead', async ({ page }) => {
+  let attempts = 0;
+  await page.route(endpoint, route => {
+    attempts++;
+    return route.fulfill({ json: { ok: true } });
+  });
+  await openForm(page);
+  await fillForm(page);
+  const website = page.locator('#website');
+  const profile = page.locator('#profile');
+  for (const value of ['https:/example.com', 'example..com', 'https://exa mple.com', 'ftp://example.com', 'javascript:alert(1)', 'https://person@example.com', '   ']) {
+    await website.fill(value);
+    await website.press('Tab');
+    await expect(website).toHaveAttribute('aria-invalid', 'true');
+    await expect(website).toHaveValue(value);
+  }
+  await website.fill('www.example.com');
+  await expect(website).not.toHaveAttribute('aria-invalid');
+  await profile.fill('mailto:owner@example.com');
+  await profile.press('Tab');
+  await expect(profile).toHaveAttribute('aria-invalid', 'true');
+  await page.locator('#submit-enquiry').click();
+  await expect(page.locator('#form-errors')).toBeFocused();
+  expect(attempts).toBe(0);
+  expect(await eventCalls(page, 'generate_lead')).toHaveLength(0);
+  expect(await eventCalls(page, 'form_start')).toHaveLength(1);
 });

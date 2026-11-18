@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const pages = [
-  { file: '', nav: 'Home', heading: 'Good work. Let your website explain it clearly.' },
-  { file: 'about.html', nav: 'About', heading: 'Your business knowledge. A clearer way to say it.' },
-  { file: 'audit.html', nav: 'The audit', heading: 'A fresh look at your content. Words ready for your next step.' },
-  { file: 'coverage-checklist.html', nav: 'Coverage checklist', heading: 'Changed where you work? Check the whole picture.' },
-  { file: 'enquire.html', nav: 'Enquire', heading: 'A clearer next step starts with your question.' },
+  { file: '', nav: 'Home', heading: 'Website and SEO audits for Perth cleaners' },
+  { file: 'about.html', nav: 'About', heading: 'How Local Lift audits your website' },
+  { file: 'audit.html', nav: 'The audit', heading: 'What the website and SEO audit covers' },
+  { file: 'coverage-checklist.html', nav: 'Coverage checklist', heading: 'Coverage checklist for Perth cleaners' },
+  { file: 'enquire.html', nav: 'Enquire', heading: 'Enquire about an audit' },
 ];
 for (const width of [1440, 768, 390, 320]) {
   for (const item of pages) {
@@ -73,19 +73,54 @@ test('keyboard skip link, mobile menu, Escape and breakpoint reset', async ({ pa
   await expect(menu).toBeHidden();
 });
 
-test('both visitor journeys are navigable', async ({ page }) => {
+for (const [device, width, height] of [['phone', 390, 844], ['tablet', 768, 1024], ['desktop', 1440, 1000]] as const) {
+  test(`both visitor journeys reach the form on ${device}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto('./');
+    await page.getByRole('link', { name: 'Explore the audit', exact: true }).first().click();
+    await page.getByRole('link', { name: 'Inspect the sample', exact: true }).click();
+    await expect(page).toHaveURL(/audit\.html#sample$/);
+    await page.getByRole('link', { name: 'Suitability', exact: true }).click();
+    await expect(page).toHaveURL(/audit\.html#suitability$/);
+    await page.locator('main a[data-event="enquiry"]').first().click();
+    await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
+    await expect(page.locator('#enquiry-form')).toBeFocused();
+    await expect(page.locator('#email')).toBeInViewport();
+
+    await page.goto('./');
+    await page.locator('.guide-promo').click();
+    await expect(page.getByRole('link', { name: /Read Google’s official/ })).toHaveAttribute('href', 'https://support.google.com/business/answer/9157481');
+    await page.getByRole('link', { name: 'See a worked example' }).click();
+    await expect(page).toHaveURL(/coverage-checklist\.html#worked-example$/);
+    await page.getByRole('link', { name: 'Explore the audit', exact: true }).first().click();
+    await expect(page).toHaveURL(/audit\.html$/);
+    await page.locator('main a[data-event="enquiry"]').first().click();
+    await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
+    await expect(page.locator('#email')).toBeInViewport();
+  });
+}
+
+test('keyboard Enquire targets the form panel, then the first field, including from the same page', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('./');
-  await page.getByRole('link', {name:'Explore the review',exact:true}).first().click();
-  await page.getByRole('link', {name:'Inspect the sample',exact:true}).click();
-  await expect(page).toHaveURL(/audit\.html#sample$/);
-  await page.getByRole('link', {name:'Suitability',exact:true}).click();
-  await expect(page).toHaveURL(/audit\.html#suitability$/);
-  await page.getByRole('link', {name:'Ask whether it fits'}).click();
-  await expect(page).toHaveURL(/enquire\.html$/);
-  await page.goto('coverage-checklist.html');
-  await expect(page.getByRole('link', {name:/Read Google’s official/})).toHaveAttribute('href','https://support.google.com/business/answer/9157481');
-  await page.getByRole('link', {name:'Explore the review',exact:true}).first().click();
-  await expect(page).toHaveURL(/audit\.html$/);
+  const menu = page.getByRole('button', { name: 'Menu', exact: true });
+  const enquire = page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Enquire' });
+  await menu.click();
+  await enquire.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#enquiry-form')).toBeFocused();
+  await expect(page.locator('#email')).toBeInViewport();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#email')).toBeFocused();
+  expect(await page.locator('#email').evaluate(el => getComputedStyle(el).outlineWidth)).toBe('3px');
+
+  await menu.click();
+  await enquire.focus();
+  await page.keyboard.press('Enter');
+  await expect(menu).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('#enquiry-form')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#email')).toBeFocused();
 });
 
 test('no form endpoint or analytics consent means no submissions or tracking', async ({ page }) => {
@@ -95,7 +130,7 @@ test('no form endpoint or analytics consent means no submissions or tracking', a
   await expect(page.locator('#form-availability')).toBeVisible();
   await page.getByLabel('Email', {exact:false}).fill('owner@example.com');
   await page.getByLabel('Business website', {exact:false}).fill('https://example.com');
-  await page.getByLabel('What would you like reviewed?', {exact:false}).fill('Please review service inclusions.');
+  await page.locator('#reason').fill('Please review service inclusions.');
   await page.getByRole('button', {name:'Send enquiry'}).click();
   await expect(page.getByRole('status')).toContainText('Nothing has been sent');
   await expect(page.locator('#form-success')).toBeHidden();
@@ -112,12 +147,23 @@ test('validation is accessible, specific, and retains answers', async ({ page })
   await page.locator('#form-errors a').first().click();
   await expect(page.locator('#email')).toBeFocused();
   await page.locator('#email').fill('invalid');
+  await page.locator('#email').press('Tab');
+  await expect(page.locator('#email-error')).toBeVisible();
+  await expect(page.locator('#email')).toHaveAttribute('aria-describedby', /email-error/);
+  await page.locator('#email').fill('owner@example.com');
+  await expect(page.locator('#email-error')).toBeHidden();
+  await page.locator('#email').fill('invalid');
   await page.locator('#website').fill('javascript:alert(1)');
+  await page.locator('#website').press('Tab');
+  await expect(page.locator('#website-error')).toBeVisible();
+  await expect(page.locator('#website')).toHaveAttribute('aria-describedby', /website-error/);
   await page.locator('#reason').fill('   ');
   await page.locator('#profile').fill('not a web link');
   await page.getByRole('button', {name:'Send enquiry'}).click();
   await expect(page.locator('#form-errors li')).toHaveCount(4);
   await expect(page.locator('#email')).toHaveAttribute('aria-invalid','true');
+  await expect(page.locator('#email')).toHaveValue('invalid');
+  await expect(page.locator('#website')).toHaveValue('javascript:alert(1)');
   const result = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   expect(result.violations).toEqual([]);
 });
@@ -135,7 +181,7 @@ test('GTM loads once after consent and receives safe events without direct GA4',
   expect(requests).toEqual(['https://www.googletagmanager.com/gtm.js?id=GTM-PG38VX8P']);
   const events = () => page.evaluate(() => (window.dataLayer || []).filter(item => typeof item === 'object' && item !== null && 'event' in item) as Record<string,unknown>[]);
   expect((await events()).filter(e=>e.event==='gtm.js')).toHaveLength(1);
-  expect((await events()).filter(e=>e.event==='page_view')).toEqual([expect.objectContaining({page_location:'https://kapohari2k.github.io/BUSN9155_Codex/enquire.html',page_referrer:''})]);
+  await expect.poll(async () => (await events()).filter(e=>e.event==='page_view')).toEqual([expect.objectContaining({page_location:'https://kapohari2k.github.io/BUSN9155_Codex/enquire.html',page_referrer:''})]);
   await page.locator('#email').fill('private-invalid-value');
   await page.getByRole('button',{name:'Send enquiry'}).click();
   expect((await events()).filter(e=>e.event==='form_start')).toHaveLength(1);

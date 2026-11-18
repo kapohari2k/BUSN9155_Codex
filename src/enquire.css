@@ -1,0 +1,122 @@
+.enquiry-layout {
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(28px, 6vw, 88px);
+  padding-block: clamp(28px, 5vw, 68px) clamp(48px, 7vw, 88px);
+}
+
+.enquiry-layout .form-panel {
+  padding: clamp(22px, 4vw, 44px);
+  scroll-margin-block-start: 0;
+}
+
+.enquiry-layout .form-panel:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.enquiry-layout :is(.error-summary, .success-panel):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.enquiry-layout .form-heading h1 {
+  font-size: clamp(2.4rem, 5vw, 4.3rem);
+  margin-bottom: 12px;
+}
+
+.enquiry-layout :is(.form-heading > p, .enquiry-aside p) {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.enquiry-layout .form-heading > p {
+  margin-bottom: 16px;
+}
+
+.enquiry-layout .notice {
+  margin-bottom: 16px;
+}
+
+.enquiry-layout .required-note,
+.enquiry-layout .enquiry-disclosure {
+  font-size: .84rem;
+  line-height: 1.55;
+}
+
+.enquiry-layout .required-note {
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+
+.enquiry-layout .field {
+  margin-bottom: 18px;
+}
+
+.enquiry-layout .field > label {
+  font-size: .95rem;
+  margin-bottom: 6px;
+}
+
+.enquiry-layout .field :is(input:not([aria-invalid]), textarea:not([aria-invalid])) {
+  border-color: #718278;
+}
+
+.enquiry-layout .field :is(input, textarea) {
+  font-size: 1rem;
+}
+
+.enquiry-layout .field textarea {
+  min-height: 88px;
+}
+
+.enquiry-layout .field :is(.field-hint, .field-error) {
+  font-size: .84rem;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.enquiry-layout .field-error:empty {
+  margin: 0;
+}
+
+.enquiry-layout .optional {
+  font-size: .82rem;
+  margin-inline-start: 4px;
+}
+
+.enquiry-layout .enquiry-aside {
+  padding-top: 20px;
+}
+
+.enquiry-layout .enquiry-aside h2 {
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+  margin-bottom: 16px;
+}
+
+.enquiry-layout .information-use {
+  margin: 24px 0 0;
+}
+
+.enquiry-layout .information-use h3 {
+  font-size: .95rem;
+}
+
+.enquiry-layout .information-use p {
+  font-size: .88rem;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 720px) {
+  .enquiry-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .enquiry-layout .form-heading h1 {
+    font-size: clamp(2.25rem, 8vw, 3.2rem);
+  }
+
+  .enquiry-layout .enquiry-aside {
+    padding-top: 0;
+  }
+}

@@ -19,7 +19,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: integration ? 'integration' : 'site', testMatch: integration ? /integration\.spec\.ts/ : /site\.spec\.ts/ }],
+  projects: [{ name: integration ? 'integration' : 'site', testMatch: integration ? /integration\.spec\.ts/ : /(?:site|consent)\.spec\.ts/ }],
   webServer: {
     command: `npm run preview -- ${integration ? '--outDir .test-dist ' : ''}--host 127.0.0.1 --port ${port} --strictPort`,
     url: `http://127.0.0.1:${port}/BUSN9155_Codex/`,

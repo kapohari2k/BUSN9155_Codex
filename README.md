@@ -1,8 +1,8 @@
 # Local Lift
 
-A five-page static website for the proposed **Website and enquiry clarity review for Perth cleaners**, developed for BUSN9155 Part B.
+A five-page static website for the proposed **Website and SEO audit for owner-led Perth residential cleaning businesses**, developed for BUSN9155 Part B.
 
-Prepared deployment address: **https://kapohari2k.github.io/BUSN9155_Codex/**. This draft has **not** been pushed to `main` or publicly deployed by the assistant.
+Public GitHub Pages address: **https://kapohari2k.github.io/BUSN9155_Codex/**. The working tree preview shows local changes before publication.
 
 ## Run locally
 
@@ -14,7 +14,7 @@ npm install --legacy-peer-deps
 npm run dev
 ```
 
-Vite prints the development address. Development uses `/` by default. If your checkout is elsewhere, use its actual directory. Each cloud task already has an isolated checkout; no extra Git worktree is needed.
+Vite prints the development address. Development uses `/` by default. If your checkout is elsewhere, use its actual directory. Run the commands from the repository checkout.
 
 ## Build and preview the actual Pages path
 
@@ -67,11 +67,11 @@ An invalid form endpoint or measurement ID also stays disabled. The form provide
 4. Rebuild/deploy only when ready. Submit a controlled test on the published origin. Confirm Formspree returns JSON with `ok: true`, the receipt screen appears, and the configured recipient actually receives the enquiry. A receipt screen alone does not prove inbox delivery.
 5. Test an invalid field and a failed request. Answers should stay in the form. Pending requests disable the submit button. Receipt-uncertain errors warn against immediate duplicate retries.
 
-The form collects required email, business website and review reason; Google profile and publisher choice are optional. Answers are sent by POST only to the configured endpoint. They are never added to analytics or page query strings. No passwords, payment or account access are requested. With JavaScript unavailable, the submit button stays disabled and a message explains why. Answers are not saved to browser storage and can be lost on refresh or leaving the page.
+The form collects email, business website and what the owner wants reviewed. A public Google Business Profile link is optional. Bare domains are sent as HTTPS links. Answers are sent by POST only to the configured endpoint. They are never added to analytics or page query strings. No passwords, payment or account access are requested. With JavaScript unavailable, the submit button stays disabled and a message explains why. Answers are not saved to browser storage and can be lost on refresh or leaving the page.
 
 ### Enable GA4
 
-Follow the [measurement plan](docs/measurement-plan.md) before adding `VITE_GA4_MEASUREMENT_ID` as a repository variable and rebuilding. Analytics loads only after an explicit analytics opt-in. With GTM enabled, configure the Google tag and GA4 event tags in the container as documented above. Automatic form and click tracking must be disabled in GA4 to avoid duplicate or unsafe measurements. `generate_lead` is the recommended primary key event, only after service-confirmed submission.
+Follow the [measurement plan](docs/measurement-plan.md) before adding `VITE_GA4_MEASUREMENT_ID` as a repository variable and rebuilding. Analytics loads only after an explicit analytics opt-in. With GTM enabled, configure the Google tag and GA4 event tags in the container as documented above. Disable automatic page views from browser history changes, form interactions and unnecessary click tracking in GA4 to avoid duplicate events or unsanitised parameters. `generate_lead` is the recommended primary key event, only after service-confirmed submission.
 
 ## Publish later, after reviewing the draft
 
@@ -108,5 +108,7 @@ The test runner starts the correctly based preview automatically if needed. Inte
 - [Development and AI-use record](docs/development-record.md)
 - [Five-criterion rubric mapping and remaining assessment evidence](docs/rubric-mapping.md)
 - [Font attribution and licence notes](docs/third-party-notices.md)
+
+The public sitemap is at `/BUSN9155_Codex/sitemap.xml`. On project Pages, crawlers look for robots rules at the host root. Submit the project sitemap URL directly in Google Search Console.
 
 Only `dist` is uploaded by the Pages workflow. Assessment attachments, supporting documents, browser evidence, source files, test builds and env files are not copied into that directory. There is no runtime server, database, authentication, AI API or other hosting service. Optional Formspree and GA4 are the only external runtime integrations.

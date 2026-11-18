@@ -19,6 +19,12 @@ for (const page of pages) {
   titles.add(title); descriptions.add(description);
   const canonical = new URL(page === 'index.html' ? '' : page, site).href;
   assert.ok(html.includes(`rel="canonical" href="${canonical}"`), `${page}: canonical`);
+  assert.ok(html.includes(`property="og:url" content="${canonical}"`), `${page}: Open Graph URL`);
+  assert.ok(html.includes(`property="og:title" content="${title}"`), `${page}: Open Graph title`);
+  assert.ok(html.includes(`property="og:description" content="${description}"`), `${page}: Open Graph description`);
+  for (const [link] of html.matchAll(/<a\b[^>]*\bdata-event="enquiry"[^>]*>/g)) {
+    assert.equal(link.match(/\bhref="([^"]+)"/)?.[1], `${base}enquire.html#enquiry-form`, `${page}: enquiry CTA targets the form`);
+  }
   for (const match of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
     const url = match[1];
     if (url.startsWith('#') || /^https?:/.test(url)) continue;
@@ -30,7 +36,8 @@ for (const page of pages) {
 assert.equal(titles.size, 5, 'five unique titles');
 assert.equal(descriptions.size, 5, 'five unique descriptions');
 const sitemap = await readFile('dist/sitemap.xml', 'utf8');
-for (const page of pages) assert.ok(sitemap.includes(new URL(page === 'index.html' ? '' : page, site).href), `sitemap: ${page}`);
+const sitemapUrls = Array.from(sitemap.matchAll(/<loc>([^<]+)<\/loc>/g), match => match[1]);
+assert.deepEqual(sitemapUrls.sort(), pages.map(page => new URL(page === 'index.html' ? '' : page, site).href).sort(), 'sitemap contains exactly the five canonical URLs');
 assert.ok((await readFile('dist/robots.txt', 'utf8')).includes(new URL('sitemap.xml',site).href));
 const assets = await readdir('dist/assets');
 assert.ok(assets.some(file => file.endsWith('.svg')), 'imported favicon emitted');
