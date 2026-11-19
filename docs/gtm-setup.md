@@ -4,9 +4,13 @@ The site now loads the user-supplied public container **GTM-PG38VX8P** after ana
 
 `VITE_GTM_CONTAINER_ID` defaults to this container and is explicitly set in the Pages workflow. GTM takes precedence over `VITE_GA4_MEASUREMENT_ID`, so the app cannot load both the container and a separate direct GA4 script. To use the older direct GA4 implementation instead, explicitly set `VITE_GTM_CONTAINER_ID` to an empty string when building, and supply a real GA4 ID. Set both variables empty to disable both integrations.
 
-## Verify the published container
+## Published verification on 19 November 2026
 
-The owner has confirmed `form_start` in DebugView and configured the funnel. The following checks require access to the published container or GA4 property. `generate_lead` in standard reports is still unverified.
+The owner confirmed `form_start` in DebugView and configured a closed enquiry funnel. The GA4 Events report for 20 October to 19 November 2026 showed five `generate_lead` events across three users. The owner also verified that GA4 lists it as a key event and that a labelled test enquiry reached the Formspree inbox on 19 November. Figures 3 to 5 in the portfolio record the results. The sample includes test traffic.
+
+## Setup and retest the published container
+
+Use these checks when the published container or GA4 property changes.
 
 1. Configure one Google tag with the intended **GA4 G- measurement ID**, which is different from the GTM container ID. Set `send_page_view` to `false`, `allow_google_signals` to `false`, and `allow_ad_personalization_signals` to `false`. Initialise this tag before the custom event tags.
 2. Create data layer variables for `page_location`, `page_referrer`, `page_title`, `placement` and `error_category`. Use the safe page values in the initial tag configuration and event parameters. They are available from `gtm.js` onward. The known Enquire page path is `/BUSN9155_Codex/enquire.html` regardless of the form anchor or query string. Use these variables in place of built-in Page URL/Referrer values.

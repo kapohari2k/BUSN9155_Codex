@@ -140,6 +140,10 @@
   box-shadow: 0 6px 0 #e5e9df;
 }
 
+.audit-excerpt + .audit-excerpt {
+  margin-block-start: 1.5rem;
+}
+
 .audit-excerpt .excerpt-header {
   display: flex;
   flex-wrap: wrap;

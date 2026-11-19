@@ -41,9 +41,9 @@ base: process.env.VITE_BASE_PATH ?? (command === 'build' ? '/BUSN9155_Codex/' : 
 
 The default output is `dist`. All five pages are explicit build inputs. Content is in HTML, not hidden in a client-side router. Shared navigation, metadata and footer are inserted at build time. Internal links include the project base. Fonts and the SVG favicon use ES module imports and are emitted into `dist/assets` with `assetsInlineLimit: 0`. No external font host is used.
 
-## Analytics update: 9 November 2026
+## Published enquiry and analytics checks
 
-The supplied Google Tag Manager container **GTM-PG38VX8P** is now configured. It loads only after analytics opt-in and takes priority over direct GA4 to avoid duplicate tracking. Follow [GTM setup and verification](docs/gtm-setup.md) to configure/publish the container's GA4 tags. Collection is not yet verified. The direct-GA4 instructions below describe the alternative implementation; explicitly set `VITE_GTM_CONTAINER_ID` empty to use it.
+The site loads **GTM-PG38VX8P** after analytics opt-in. GTM takes priority over direct GA4 to avoid duplicate tracking. The owner confirmed live Formspree inbox delivery and GA4 reporting on 19 November 2026. See [GTM setup and verification](docs/gtm-setup.md) for the reported counts and the procedure for retesting a changed container.
 
 ## Optional configuration
 
@@ -73,9 +73,9 @@ The form collects email, business website and what the owner wants reviewed. A p
 
 Follow the [measurement plan](docs/measurement-plan.md) before adding `VITE_GA4_MEASUREMENT_ID` as a repository variable and rebuilding. Analytics loads only after an explicit analytics opt-in. With GTM enabled, configure the Google tag and GA4 event tags in the container as documented above. Disable automatic page views from browser history changes, form interactions and unnecessary click tracking in GA4 to avoid duplicate events or unsanitised parameters. `generate_lead` is the recommended primary key event, only after service-confirmed submission.
 
-## Publish later, after reviewing the draft
+## Deploy changes
 
-The workflow is prepared at `.github/workflows/deploy.yml`. **Do not push to `main` until you intend to trigger public deployment.** No push, workflow dispatch or publication was performed during this draft.
+The workflow at `.github/workflows/deploy.yml` publishes reviewed changes pushed to `main`.
 
 1. Review the website, business facts and disclosures. Configure and verify the form/GA4 when available.
 2. In the repository, choose **Settings → Pages → Source → GitHub Actions**.
@@ -102,11 +102,11 @@ The test runner starts the correctly based preview automatically if needed. Inte
 
 ## Handover
 
-- [Word supporting draft](docs/Local-Lift-Part-B-supporting-draft.docx), assembled from the supporting records for review, with live verification and student refinement clearly outstanding
+- [Early Word draft](docs/Local-Lift-Part-B-supporting-draft.docx), retained as a development record and superseded by the final Word portfolio
 - [Measurement plan and live verification](docs/measurement-plan.md)
-- [Actual test record](docs/test-record.md)
+- [Initial local test record from 2 November](docs/test-record.md)
 - [Development and AI-use record](docs/development-record.md)
-- [Five-criterion rubric mapping and remaining assessment evidence](docs/rubric-mapping.md)
+- [Initial rubric mapping and handover](docs/rubric-mapping.md)
 - [Font attribution and licence notes](docs/third-party-notices.md)
 
 The public sitemap is at `/BUSN9155_Codex/sitemap.xml`. On project Pages, crawlers look for robots rules at the host root. Submit the project sitemap URL directly in Google Search Console.

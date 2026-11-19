@@ -1,5 +1,7 @@
 # Part B rubric mapping and handover
 
+This is the initial development handover. The published verification on 19 November is recorded in the [GTM notes](gtm-setup.md), and the final Word portfolio contains the current assessment evidence.
+
 The implementation is designed to support the five Excellent descriptors. This is an evidence map, not a predicted mark. The assessment brief requires publication and verified GA4 collection; those are deliberately **not claimed complete** in this first draft.
 
 | Criterion (8 points each) | Evidence prepared in this repository | Remaining evidence or limitation |
