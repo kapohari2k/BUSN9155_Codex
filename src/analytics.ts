@@ -1,4 +1,5 @@
 import './consent.css';
+import { analyticsConfig, analyticsStorageKey as storageKey } from './analytics-config';
 
 type EventName = 'enquiry_cta_click' | 'sample_select' | 'guide_select' | 'form_start' | 'form_error' | 'generate_lead';
 const allowedLabels = ['header', 'footer', 'home-hero', 'home-guide', 'home-close', 'about-sample', 'about-guide', 'about-enquiry', 'audit-intro', 'audit-contents', 'audit-close', 'guide-close', 'enquire-aside', 'enquire-success'] as const;
@@ -8,12 +9,9 @@ type EventParameters = { placement?: SafeLabel; error_category?: ErrorCategory }
 declare global {
   interface Window { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void; }
 }
-const id = import.meta.env.VITE_GA4_MEASUREMENT_ID?.trim() || '';
-const containerId = (import.meta.env.VITE_GTM_CONTAINER_ID ?? 'GTM-PG38VX8P').trim();
-const useGtm = /^GTM-[A-Z0-9]+$/.test(containerId);
-const validMeasurementId = /^G-[A-Z0-9]{6,15}$/.test(id);
-const configured = useGtm || validMeasurementId;
-const storageKey = 'local-lift-analytics';
+const { id, containerId, useGtm, validMeasurementId, configured } = analyticsConfig(
+  import.meta.env.VITE_GTM_CONTAINER_ID, import.meta.env.VITE_GA4_MEASUREMENT_ID,
+);
 let enabled = false;
 let started = false;
 let tagReady = false;
@@ -134,21 +132,10 @@ function applyChoice(allow: boolean): void {
 }
 
 export function initAnalytics(): void {
-  if (!configured) return;
+  const panel = document.querySelector<HTMLElement>('#analytics-choices');
+  if (!configured || !panel) return;
   const preferences = document.querySelector<HTMLButtonElement>('.analytics-preferences');
   const main = document.querySelector<HTMLElement>('main');
-  const panel = document.createElement('section');
-  panel.id = 'analytics-choices';
-  panel.className = 'analytics-banner';
-  panel.setAttribute('aria-labelledby', 'analytics-title');
-  panel.innerHTML = `<div class="container analytics-inner">
-    <div><h2 id="analytics-title" tabindex="-1">Optional analytics</h2><p>Google Analytics measures site use. Enquiry answers stay out of analytics. Change your choice in the footer.</p></div>
-    <div class="analytics-actions">
-      <button type="button" data-choice="allow">Allow analytics</button>
-      <button type="button" data-choice="decline">Continue without analytics</button>
-      <button type="button" class="analytics-close" hidden>Close preferences</button>
-    </div>
-  </div>`;
   const heading = panel.querySelector<HTMLElement>('#analytics-title')!;
   const close = panel.querySelector<HTMLButtonElement>('.analytics-close')!;
   let choice: string | null = null;
@@ -157,10 +144,8 @@ export function initAnalytics(): void {
   const hasChoice = (): boolean => choice === 'allow' || choice === 'decline';
   applyChoice(choice === 'allow');
   panel.hidden = hasChoice();
-  if (main) main.before(panel);
-  else document.body.prepend(panel);
 
-  function closePanel(): void {
+  const closePanel = (): void => {
     if (openedFromFooter) {
       openedFromFooter = false;
       preferences?.setAttribute('aria-expanded', 'false');
@@ -172,7 +157,7 @@ export function initAnalytics(): void {
       if (panel.contains(document.activeElement)) main?.focus({ preventScroll: true });
       panel.hidden = hasChoice();
     }
-  }
+  };
 
   panel.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach(button => {
     button.addEventListener('click', () => {

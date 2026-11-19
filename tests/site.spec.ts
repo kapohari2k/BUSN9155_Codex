@@ -303,3 +303,39 @@ for (const [device, width, height, hasTouch] of [
     }
   });
 }
+
+for (const firstVisit of [true, false]) {
+  test(`mobile Audit layout is ready before the main bundle (${firstVisit ? 'first visit' : 'saved choice'})`, async ({ page }) => {
+    await page.setViewportSize({ width: 412, height: 823 });
+    if (!firstVisit) await page.addInitScript(() => localStorage.setItem('local-lift-analytics', 'decline'));
+    let releaseBundle!: () => void;
+    const bundleReady = new Promise<void>(resolve => { releaseBundle = resolve; });
+    await page.route('**/assets/main-*.js', async route => {
+      await bundleReady;
+      await route.continue();
+    });
+    await page.goto('audit.html', { waitUntil: 'commit' });
+    const main = page.locator('main');
+    const banner = page.locator('#analytics-choices');
+    const menu = page.getByRole('button', { name: 'Menu', exact: true });
+    const position = () => main.evaluate(el => el.getBoundingClientRect().top);
+    let firstPosition: number;
+    try {
+      await expect(main.locator('h1')).toBeVisible();
+      await expect(menu).toBeVisible();
+      await expect(page.locator('#primary-nav')).toBeHidden();
+      if (firstVisit) await expect(banner).toBeVisible();
+      else await expect(banner).toBeHidden();
+      await expect(page.locator('.analytics-preferences')).toBeHidden();
+      firstPosition = await position();
+    } finally {
+      releaseBundle();
+    }
+
+    await page.waitForLoadState('load');
+    await page.evaluate(() => document.fonts.ready);
+    expect(await position()).toBeCloseTo(firstPosition, 0);
+    await menu.click();
+    await expect(page.locator('#primary-nav')).toBeVisible();
+  });
+}
