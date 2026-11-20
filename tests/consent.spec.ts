@@ -15,8 +15,8 @@ test('guided coverage events require consent and contain only safe page context'
   });
   const nextSteps = page.getByRole('button', { name: 'Show my next steps' });
   const finishCheck = async () => {
-    for (const name of ['Google Business Profile', 'Website', 'Quote form']) {
-      await page.getByRole('group', { name, exact: true }).getByRole('radio', { name: 'Needs updating' }).check();
+    for (const name of ['Yes', 'Suburb included', 'Says it’s outside your area', 'Form blocks the suburb']) {
+      await page.getByRole('radio', { name, exact: true }).check();
     }
     await nextSteps.click();
     await expect(page.getByRole('heading', { name: 'Your next steps' })).toBeVisible();

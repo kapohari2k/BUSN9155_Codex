@@ -23,35 +23,41 @@
   <section class="container coverage-check" aria-labelledby="coverage-check-heading" hidden>
     <div class="coverage-check-intro">
       <h2 id="coverage-check-heading" tabindex="-1">Check one service and suburb</h2>
-      <p>Pick a service and suburb, then confirm whether you currently offer that service there. Look at each of the three places below as a customer would.</p>
-      <p>Choose <strong>Matches</strong> if what you see reflects where you work. Choose <strong>Needs updating</strong> if it’s wrong or misleading, or <strong>Unsure</strong> if you can’t tell.</p>
+      <p>Pick a service and suburb. Tell us whether you offer the service there, then look up what a customer can see or do. The check compares your answers and shows what to fix first.</p>
     </div>
     <form id="coverage-check-form" autocomplete="off">
-      <fieldset aria-describedby="coverage-profile-hint">
-        <legend>Google Business Profile</legend>
-        <p id="coverage-profile-hint">Look up your business on Google and compare the listed areas and services with your current coverage.</p>
+      <fieldset>
+        <legend>Do you offer that service in the suburb?</legend>
         <div class="coverage-options">
-          <label><input type="radio" name="profile" value="matches" required> Matches</label>
-          <label><input type="radio" name="profile" value="update"> Needs updating</label>
-          <label><input type="radio" name="profile" value="unsure"> Unsure</label>
+          <label><input type="radio" name="serves" value="yes" required> Yes</label>
+          <label><input type="radio" name="serves" value="no"> No</label>
+        </div>
+      </fieldset>
+      <fieldset aria-describedby="coverage-profile-hint">
+        <legend>What does your Google Business Profile show?</legend>
+        <p id="coverage-profile-hint">Look up your public listing. Count the suburb as included if a listed area clearly covers it.</p>
+        <div class="coverage-options">
+          <label><input type="radio" name="profile" value="yes" required> Suburb included</label>
+          <label><input type="radio" name="profile" value="no"> Suburb missing from the list</label>
+          <label><input type="radio" name="profile" value="unclear"> Can’t tell</label>
         </div>
       </fieldset>
       <fieldset aria-describedby="coverage-website-hint">
-        <legend>Website</legend>
-        <p id="coverage-website-hint">Read the relevant service and coverage pages. Look for outdated suburb lists or broad claims like “all of Perth”.</p>
+        <legend>What does your website say?</legend>
+        <p id="coverage-website-hint">Read the service and coverage pages. A claim like “all of Perth” gives customers reason to expect coverage in that suburb.</p>
         <div class="coverage-options">
-          <label><input type="radio" name="website" value="matches" required> Matches</label>
-          <label><input type="radio" name="website" value="update"> Needs updating</label>
-          <label><input type="radio" name="website" value="unsure"> Unsure</label>
+          <label><input type="radio" name="website" value="yes" required> Says you cover it</label>
+          <label><input type="radio" name="website" value="no"> Says it’s outside your area</label>
+          <label><input type="radio" name="website" value="unclear"> Unclear or conflicting</label>
         </div>
       </fieldset>
       <fieldset aria-describedby="coverage-quote-hint">
-        <legend>Quote form</legend>
-        <p id="coverage-quote-hint">Open the quote form on your phone. Check its suburb choices and what it tells customers about confirming coverage.</p>
+        <legend>Can a customer start a quote for that suburb?</legend>
+        <p id="coverage-quote-hint">On your phone, choose the service and try entering or selecting the suburb. Check what the form tells you before sending anything.</p>
         <div class="coverage-options">
-          <label><input type="radio" name="quote" value="matches" required> Matches</label>
-          <label><input type="radio" name="quote" value="update"> Needs updating</label>
-          <label><input type="radio" name="quote" value="unsure"> Unsure</label>
+          <label><input type="radio" name="quote" value="yes" required> Form accepts the suburb</label>
+          <label><input type="radio" name="quote" value="no"> Form blocks the suburb</label>
+          <label><input type="radio" name="quote" value="unclear"> Can’t tell</label>
         </div>
       </fieldset>
       <button type="submit" class="button">Show my next steps</button>
@@ -60,7 +66,7 @@
 
     <section id="coverage-result" class="coverage-result" aria-labelledby="coverage-result-heading" hidden>
       <h3 id="coverage-result-heading" tabindex="-1">Your next steps</h3>
-      <p id="coverage-matches" hidden>All three places match for the service and suburb you checked. Use the same check for another suburb, or repeat it when your coverage changes.</p>
+      <p id="coverage-matches" hidden>Your answers point to consistent coverage for this service and suburb. Repeat the check for another suburb or after your service area changes.</p>
       <ol id="coverage-actions" hidden></ol>
       <p id="coverage-retest" hidden>After publishing a change, check the public information and walk through the quote form again on your phone.</p>
       <div class="coverage-audit">

@@ -3,19 +3,19 @@ import { track } from './analytics';
 
 const advice = {
   quote: {
-    label: 'the quote form',
-    update: 'Update the suburb options or instructions so customers can request a quote for covered suburbs and see when you’ll confirm availability.',
-    unsure: 'Walk through the form on your phone. Check whether a customer can request that service for the suburb and tell when you’ll confirm availability.',
+    yes: ['Unblock quote requests from the suburb.', 'Add the suburb to the quote form’s choices for that service, or allow customers to type it if you confirm coverage manually. On a phone, check that a customer can move on to the contact details.'],
+    no: ['Show the service exclusion before asking for contact details.', 'Put “We don’t offer [service] in [suburb]” beside the service or suburb field. If you offer other services there, keep those quote options available.'],
+    unclear: ['Check what happens after a customer enters the suburb.', 'If the form accepts any suburb for manual review, explain when you’ll confirm coverage. Try one suburb you serve and one you don’t on a phone, stopping before you send the form.'],
   },
   website: {
-    label: 'the website',
-    update: 'Update the coverage wording on the relevant service and area pages. Replace any broad or outdated wording with the current areas for that service.',
-    unsure: 'Read the relevant service and area pages as a first-time visitor. Check whether you can tell if the service is available in that suburb.',
+    yes: ['Add the suburb to the relevant service page.', 'Place a line like “We offer [service] in [suburb]” near the quote button. Check that the coverage page gives the same answer.'],
+    no: ['Replace the coverage claim on the service page.', 'If the page says “all of Perth”, list the areas you actually cover for that service. If the suburb appears in an old list, remove it from that service’s list.'],
+    unclear: ['Answer the coverage question next to the quote button.', 'State which suburbs you serve for this service, or explain how customers can confirm availability. Make the service and coverage pages agree.'],
   },
   profile: {
-    label: 'your Google Business Profile',
-    update: 'Update your service areas or listed services to reflect your confirmed coverage. Then check how the profile appears publicly.',
-    unsure: 'Open the public profile in Google Search or Maps and compare the service areas and services shown with your confirmed coverage.',
+    yes: ['Review the missing area on Google.', 'Open your Business Profile’s service-area settings. If no configured area covers the suburb, add the appropriate area and then check the public listing.'],
+    no: ['Check whether any other service still covers the suburb.', 'Keep the suburb in your Google service area if you still serve it for another service. Make the exclusion clear on the relevant service page. If the business no longer serves the suburb at all, review the profile’s service-area settings.'],
+    unclear: ['Check the service areas configured on Google.', 'Open the profile’s service-area settings and see whether a listed suburb, postcode or area covers this location before editing the public profile.'],
   },
 } as const;
 
@@ -39,22 +39,30 @@ form.addEventListener('change', () => {
 form.addEventListener('submit', event => {
   event.preventDefault();
   const answers = new FormData(form);
+  const serves = answers.get('serves');
+  if (serves !== 'yes' && serves !== 'no') return;
+
+  const fixes: (readonly [string, string])[] = [];
+  const checks: (readonly [string, string])[] = [];
+  for (const [channel, instructions] of Object.entries(advice)) {
+    const observed = answers.get(channel);
+    if (observed === 'unclear') checks.push(instructions.unclear);
+    else if (observed !== serves) fixes.push(instructions[serves]);
+  }
+
   actions.replaceChildren();
-  // Show confirmed issues first, prioritising the quote path within each group.
-  for (const status of ['update', 'unsure'] as const) {
-    for (const [channel, step] of Object.entries(advice)) {
-      if (answers.get(channel) !== status) continue;
-      const item = document.createElement('li');
-      const label = document.createElement('strong');
-      label.textContent = `${status === 'update' ? 'Update' : 'Verify'} ${step.label}.`;
-      item.append(label, ` ${step[status]}`);
-      actions.append(item);
-    }
+  // Put coverage mismatches ahead of follow-up checks, with the quote path first.
+  for (const [title, detail] of [...fixes, ...checks]) {
+    const item = document.createElement('li');
+    const label = document.createElement('strong');
+    label.textContent = title;
+    item.append(label, ` ${detail}`);
+    actions.append(item);
   }
   const hasActions = actions.childElementCount > 0;
   actions.hidden = !hasActions;
   matches.hidden = hasActions;
-  retest.hidden = !Object.keys(advice).some(channel => answers.get(channel) === 'update');
+  retest.hidden = fixes.length === 0;
   result.hidden = false;
   heading.focus();
   if (completed) return;

@@ -252,24 +252,31 @@ test('guided coverage check supports keyboard use and leads to the sample PDF', 
   await page.getByRole('button', { name: 'Continue without analytics' }).click();
   const submit = page.getByRole('button', { name: 'Show my next steps' });
   const result = page.getByRole('region', { name: 'Your next steps' });
-  const profile = page.getByRole('group', { name: 'Google Business Profile' }).getByRole('radio', { name: 'Matches' });
+  const serves = page.getByRole('radio', { name: 'Yes', exact: true });
   await submit.click();
   await expect(result).toBeHidden();
-  await expect(profile).toBeFocused();
+  await expect(serves).toBeFocused();
   await page.keyboard.press('Space');
-  for (const name of ['Website', 'Quote form']) {
-    const group = page.getByRole('group', { name, exact: true });
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('radio', { name: 'Suburb included', exact: true })).toBeFocused();
+  await page.keyboard.press('Space');
+  for (const [first, selected] of [
+    ['Says you cover it', 'Says it’s outside your area'],
+    ['Form accepts the suburb', 'Form blocks the suburb'],
+  ]) {
     await page.keyboard.press('Tab');
-    await expect(group.getByRole('radio', { name: 'Matches' })).toBeFocused();
+    await expect(page.getByRole('radio', { name: first, exact: true })).toBeFocused();
     await page.keyboard.press('ArrowRight');
-    await expect(group.getByRole('radio', { name: 'Needs updating' })).toBeChecked();
+    await expect(page.getByRole('radio', { name: selected, exact: true })).toBeChecked();
   }
   await page.keyboard.press('Tab');
   await expect(submit).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(result.getByRole('heading')).toBeFocused();
   await expect(result.getByRole('heading')).toBeInViewport();
-  await expect(result.getByRole('listitem')).toHaveText([/^Update the quote form/, /^Update the website/]);
+  await expect(result.getByRole('listitem')).toHaveText([/^Unblock quote requests/, /^Add the suburb to the relevant service page/]);
+  await expect(result.getByText(/move on to the contact details/)).toBeVisible();
+  await expect(result.getByText(/We offer \[service\] in \[suburb\]/)).toBeVisible();
   await expect(result.getByText(/After publishing a change/)).toBeVisible();
   const a11y = await new AxeBuilder({ page }).include('.coverage-check')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
@@ -290,27 +297,36 @@ test('guided coverage advice reflects all answer combinations and supports anoth
   await page.goto('coverage-checklist.html');
   const form = page.locator('#coverage-check-form');
   const result = page.getByRole('region', { name: 'Your next steps' });
-  const statuses = ['matches', 'update', 'unsure'] as const;
-  const channels = [['quote', 'the quote form'], ['website', 'the website'], ['profile', 'your Google Business Profile']] as const;
-  for (const quote of statuses) for (const website of statuses) for (const profile of statuses) {
-    const answers = { quote, website, profile };
-    const expected = [
-      ...channels.filter(([key]) => answers[key] === 'update').map(([, label]) => `Update ${label}.`),
-      ...channels.filter(([key]) => answers[key] === 'unsure').map(([, label]) => `Verify ${label}.`),
-    ];
-    await form.evaluate((element: HTMLFormElement, answerMap) => {
-      for (const [key, value] of Object.entries(answerMap)) {
-        const input = element.querySelector<HTMLInputElement>(`[name="${key}"][value="${value}"]`)!;
-        input.click();
-      }
-      element.requestSubmit();
-    }, answers);
-    await expect(result).toBeVisible();
-    expect(await result.locator('li strong').allTextContents()).toEqual(expected);
-    expect(await result.getByText(/All three places match/).isVisible()).toBe(expected.length === 0);
-    expect(await result.getByText(/After publishing a change/).isVisible()).toBe(Object.values(answers).includes('update'));
+  const statuses = ['yes', 'no', 'unclear'] as const;
+  const combinations = statuses.flatMap(quote => statuses.flatMap(website => statuses.map(profile => ({ quote, website, profile }))));
+  const recommendations = {
+    quote: ['Unblock quote requests', 'Show the service exclusion', 'Check what happens'],
+    website: ['Add the suburb', 'Replace the coverage claim', 'Answer the coverage question'],
+    profile: ['Review the missing area', 'Check whether any other service', 'Check the service areas'],
+  } as const;
+  const channels = ['quote', 'website', 'profile'] as const;
+  for (const serves of ['yes', 'no'] as const) {
+    for (const observations of combinations) {
+      const mismatches = channels.filter(channel => observations[channel] === (serves === 'yes' ? 'no' : 'yes'));
+      const followUps = channels.filter(channel => observations[channel] === 'unclear');
+      const titles = [
+        ...mismatches.map(channel => recommendations[channel][serves === 'yes' ? 0 : 1]),
+        ...followUps.map(channel => recommendations[channel][2]),
+      ];
+      await form.evaluate((element: HTMLFormElement, answerMap) => {
+        for (const [key, value] of Object.entries(answerMap)) {
+          const input = element.querySelector<HTMLInputElement>(`[name="${key}"][value="${value}"]`)!;
+          input.click();
+        }
+        element.requestSubmit();
+      }, { serves, ...observations });
+      await expect(result).toBeVisible();
+      await expect(result.locator('li strong')).toHaveText(titles.map(title => new RegExp(`^${title}`)));
+      expect(await result.getByText(/point to consistent coverage/).isVisible()).toBe(titles.length === 0);
+      expect(await result.getByText(/After publishing a change/).isVisible()).toBe(mismatches.length > 0);
+    }
   }
-  await form.getByRole('group', { name: 'Website', exact: true }).getByRole('radio', { name: 'Matches' }).check();
+  await form.getByRole('radio', { name: 'Says you cover it', exact: true }).check();
   await expect(result).toBeHidden();
   await form.getByRole('button', { name: 'Show my next steps' }).click();
   await result.getByRole('button', { name: 'Check another service or suburb' }).click();

@@ -25,7 +25,7 @@ The [measurement plan](measurement-plan.md) defines triggers and decisions. Earl
 
 The site emits `coverage_check_start` on the first answer and `coverage_check_complete` on the first result shown, at most once each per page load and only with analytics consent. The data layer contains the event name and safe page context. The check's answers stay in the browser.
 
-In the existing GTM container, create a GA4 Event tag and a Custom Event trigger for each new event. Use the exact event name in both the tag and its trigger. Use the same GA4 stream as the existing `generate_lead` tag, safe page parameters and an `analytics_storage` requirement. In Preview, allow analytics on the coverage checklist, answer all three questions and show the result. Verify both tags in Tag Assistant and both events in GA4 DebugView before publishing the container. Leave `generate_lead` as the main key event.
+The existing GTM container has a GA4 Event tag and a Custom Event trigger for each event. Both use the same GA4 stream as `generate_lead`, safe page parameters and an `analytics_storage` requirement. To retest, allow analytics in Preview, confirm actual service coverage, answer the three observation questions and show the result. Verify both tags and their hits in Tag Assistant. `generate_lead` is the main key event.
 
 ## Validation
 
