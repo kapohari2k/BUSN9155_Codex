@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- site:head -->
   <script type="module" src="/src/main.ts"></script>
+  <script type="module" src="/src/coverage-check.ts"></script>
 </head>
 <body>
 <!-- site:header -->
@@ -13,9 +14,61 @@
     <h1>Coverage checklist for Perth cleaners</h1>
     <p class="lede">Changed where you work? Use this free checklist to update the suburbs on your Google Business Profile, website and quote form.</p>
     <div class="button-group">
+      <a class="text-link" href="#checklist-heading">Go to the five-step checklist</a>
       <a class="text-link" href="#worked-example">See a worked example <span aria-hidden="true">↓</span></a>
       <button type="button" class="text-link print-guide" hidden>Print this checklist</button>
     </div>
+  </section>
+
+  <section class="container coverage-check" aria-labelledby="coverage-check-heading" hidden>
+    <div class="coverage-check-intro">
+      <h2 id="coverage-check-heading" tabindex="-1">Check one service and suburb</h2>
+      <p>Pick a service and suburb, then confirm whether you currently offer that service there. Look at each of the three places below as a customer would.</p>
+      <p>Choose <strong>Matches</strong> if what you see reflects where you work. Choose <strong>Needs updating</strong> if it’s wrong or misleading, or <strong>Unsure</strong> if you can’t tell.</p>
+    </div>
+    <form id="coverage-check-form" autocomplete="off">
+      <fieldset aria-describedby="coverage-profile-hint">
+        <legend>Google Business Profile</legend>
+        <p id="coverage-profile-hint">Look up your business on Google and compare the listed areas and services with your current coverage.</p>
+        <div class="coverage-options">
+          <label><input type="radio" name="profile" value="matches" required> Matches</label>
+          <label><input type="radio" name="profile" value="update"> Needs updating</label>
+          <label><input type="radio" name="profile" value="unsure"> Unsure</label>
+        </div>
+      </fieldset>
+      <fieldset aria-describedby="coverage-website-hint">
+        <legend>Website</legend>
+        <p id="coverage-website-hint">Read the relevant service and coverage pages. Look for outdated suburb lists or broad claims like “all of Perth”.</p>
+        <div class="coverage-options">
+          <label><input type="radio" name="website" value="matches" required> Matches</label>
+          <label><input type="radio" name="website" value="update"> Needs updating</label>
+          <label><input type="radio" name="website" value="unsure"> Unsure</label>
+        </div>
+      </fieldset>
+      <fieldset aria-describedby="coverage-quote-hint">
+        <legend>Quote form</legend>
+        <p id="coverage-quote-hint">Open the quote form on your phone. Check its suburb choices and what it tells customers about confirming coverage.</p>
+        <div class="coverage-options">
+          <label><input type="radio" name="quote" value="matches" required> Matches</label>
+          <label><input type="radio" name="quote" value="update"> Needs updating</label>
+          <label><input type="radio" name="quote" value="unsure"> Unsure</label>
+        </div>
+      </fieldset>
+      <button type="submit" class="button">Show my next steps</button>
+      <p class="coverage-note">Your answers stay in this browser.</p>
+    </form>
+
+    <section id="coverage-result" class="coverage-result" aria-labelledby="coverage-result-heading" hidden>
+      <h3 id="coverage-result-heading" tabindex="-1">Your next steps</h3>
+      <p id="coverage-matches" hidden>All three places match for the service and suburb you checked. Use the same check for another suburb, or repeat it when your coverage changes.</p>
+      <ol id="coverage-actions" hidden></ol>
+      <p id="coverage-retest" hidden>After publishing a change, check the public information and walk through the quote form again on your phone.</p>
+      <div class="coverage-audit">
+        <p>Checked one suburb? The full Local Lift audit follows the customer journey from Google to your quote form. You get a prioritised list of fixes and suggested wording you can use.</p>
+        <a class="text-link" href="@/audit.html">See what the full audit covers</a>
+      </div>
+      <button type="button" class="text-link" id="coverage-restart">Check another service or suburb</button>
+    </section>
   </section>
 
   <section class="section container guide-layout top-rule" aria-labelledby="checklist-heading">

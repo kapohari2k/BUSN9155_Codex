@@ -7,6 +7,49 @@ const allow = (page: Page) => page.getByRole('button', { name: 'Allow analytics'
 const preferences = (page: Page) => page.getByRole('button', { name: 'Analytics choices' });
 const banner = (page: Page) => page.getByRole('region', { name: 'Optional analytics' });
 
+test('guided coverage events require consent and contain only safe page context', async ({ page, context }) => {
+  let containerLoads = 0;
+  await context.route('https://www.googletagmanager.com/**', route => {
+    containerLoads++;
+    return route.fulfill({ contentType: 'text/javascript', body: '/* GTM test stub */' });
+  });
+  const nextSteps = page.getByRole('button', { name: 'Show my next steps' });
+  const finishCheck = async () => {
+    for (const name of ['Google Business Profile', 'Website', 'Quote form']) {
+      await page.getByRole('group', { name, exact: true }).getByRole('radio', { name: 'Needs updating' }).check();
+    }
+    await nextSteps.click();
+    await expect(page.getByRole('heading', { name: 'Your next steps' })).toBeVisible();
+  };
+
+  await page.goto('coverage-checklist.html');
+  await decline(page).click();
+  await finishCheck();
+  expect(containerLoads).toBe(0);
+  expect(await page.evaluate(() => window.dataLayer)).toBeUndefined();
+
+  await preferences(page).click();
+  await allow(page).click();
+  await page.goto('coverage-checklist.html?suburb=fixture-marker#coverage-check-heading');
+  await finishCheck();
+  await nextSteps.click();
+  await page.getByRole('button', { name: 'Check another service or suburb' }).click();
+  await finishCheck();
+
+  const events = await page.evaluate(() => window.dataLayer?.filter(entry =>
+    typeof (entry as { event?: unknown }).event === 'string' &&
+    (entry as { event: string }).event.startsWith('coverage_check_')));
+  const contextFields = {
+    page_location: 'https://kapohari2k.github.io/BUSN9155_Codex/coverage-checklist.html',
+    page_title: await page.title(),
+    page_referrer: '',
+  };
+  expect(events).toEqual([
+    { event: 'coverage_check_start', ...contextFields },
+    { event: 'coverage_check_complete', ...contextFields },
+  ]);
+});
+
 test('first-visit keyboard choice keeps focus and scroll at the start of the page', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('./');

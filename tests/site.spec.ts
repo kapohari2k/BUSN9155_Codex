@@ -220,6 +220,7 @@ test('reduced motion, large text and print guide remain usable', async ({ page }
   await page.evaluate(()=> { document.documentElement.style.fontSize = ''; });
   await page.emulateMedia({media:'print'});
   await expect(page.locator('.site-header')).toBeHidden();
+  await expect(page.locator('.coverage-check')).toBeHidden();
   await expect(page.locator('.checklist-steps')).toBeVisible();
   await expect(page.locator('#worked-example')).toBeVisible();
 });
@@ -238,7 +239,84 @@ test('content remains available and navigation works without JavaScript', async 
   await page.locator('#email').fill('private@example.com');
   await expect(page.getByRole('button',{name:'Send enquiry'})).toBeDisabled();
   expect(page.url()).not.toContain('private');
+  await page.goto('http://127.0.0.1:4173/BUSN9155_Codex/coverage-checklist.html');
+  await expect(page.locator('.coverage-check')).toBeHidden();
+  await expect(page.locator('.checklist-steps')).toBeVisible();
   await context.close();
+});
+
+test('guided coverage check supports keyboard use and leads to the sample PDF', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('coverage-checklist.html');
+  await page.getByRole('button', { name: 'Continue without analytics' }).click();
+  const submit = page.getByRole('button', { name: 'Show my next steps' });
+  const result = page.getByRole('region', { name: 'Your next steps' });
+  const profile = page.getByRole('group', { name: 'Google Business Profile' }).getByRole('radio', { name: 'Matches' });
+  await submit.click();
+  await expect(result).toBeHidden();
+  await expect(profile).toBeFocused();
+  await page.keyboard.press('Space');
+  for (const name of ['Website', 'Quote form']) {
+    const group = page.getByRole('group', { name, exact: true });
+    await page.keyboard.press('Tab');
+    await expect(group.getByRole('radio', { name: 'Matches' })).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expect(group.getByRole('radio', { name: 'Needs updating' })).toBeChecked();
+  }
+  await page.keyboard.press('Tab');
+  await expect(submit).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(result.getByRole('heading')).toBeFocused();
+  await expect(result.getByRole('heading')).toBeInViewport();
+  await expect(result.getByRole('listitem')).toHaveText([/^Update the quote form/, /^Update the website/]);
+  await expect(result.getByText(/After publishing a change/)).toBeVisible();
+  const a11y = await new AxeBuilder({ page }).include('.coverage-check')
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  expect(a11y.violations).toEqual([]);
+  await page.keyboard.press('Tab');
+  const audit = result.getByRole('link', { name: 'See what the full audit covers' });
+  await expect(audit).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/audit\.html$/);
+  await page.locator('main a[href$="sample-audit.html"]').first().click();
+  const pdf = page.getByRole('link', { name: /Download sample report/ });
+  const [download] = await Promise.all([page.waitForEvent('download'), pdf.click()]);
+  expect(download.suggestedFilename()).toBe('sample-website-audit-report.pdf');
+  expect(await download.failure()).toBeNull();
+});
+
+test('guided coverage advice reflects all answer combinations and supports another check', async ({ page }) => {
+  await page.goto('coverage-checklist.html');
+  const form = page.locator('#coverage-check-form');
+  const result = page.getByRole('region', { name: 'Your next steps' });
+  const statuses = ['matches', 'update', 'unsure'] as const;
+  const channels = [['quote', 'the quote form'], ['website', 'the website'], ['profile', 'your Google Business Profile']] as const;
+  for (const quote of statuses) for (const website of statuses) for (const profile of statuses) {
+    const answers = { quote, website, profile };
+    const expected = [
+      ...channels.filter(([key]) => answers[key] === 'update').map(([, label]) => `Update ${label}.`),
+      ...channels.filter(([key]) => answers[key] === 'unsure').map(([, label]) => `Verify ${label}.`),
+    ];
+    await form.evaluate((element: HTMLFormElement, answerMap) => {
+      for (const [key, value] of Object.entries(answerMap)) {
+        const input = element.querySelector<HTMLInputElement>(`[name="${key}"][value="${value}"]`)!;
+        input.click();
+      }
+      element.requestSubmit();
+    }, answers);
+    await expect(result).toBeVisible();
+    expect(await result.locator('li strong').allTextContents()).toEqual(expected);
+    expect(await result.getByText(/All three places match/).isVisible()).toBe(expected.length === 0);
+    expect(await result.getByText(/After publishing a change/).isVisible()).toBe(Object.values(answers).includes('update'));
+  }
+  await form.getByRole('group', { name: 'Website', exact: true }).getByRole('radio', { name: 'Matches' }).check();
+  await expect(result).toBeHidden();
+  await form.getByRole('button', { name: 'Show my next steps' }).click();
+  await result.getByRole('button', { name: 'Check another service or suburb' }).click();
+  await expect(form.locator(':checked')).toHaveCount(0);
+  await expect(result).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Check one service and suburb' })).toBeFocused();
 });
 
 for (const [device, width, height, hasTouch] of [

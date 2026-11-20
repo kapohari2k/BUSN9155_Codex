@@ -21,6 +21,12 @@ Use these checks when the published container or GA4 property changes.
 
 The [measurement plan](measurement-plan.md) defines triggers and decisions. Earlier test records and the Word draft describe the initial 2 November direct-GA4 version; they are historical evidence, not verification of this container.
 
+## Guided coverage check events
+
+The site emits `coverage_check_start` on the first answer and `coverage_check_complete` on the first result shown, at most once each per page load and only with analytics consent. The data layer contains the event name and safe page context. The check's answers stay in the browser.
+
+In the existing GTM container, create a GA4 Event tag and a Custom Event trigger for each new event. Use the exact event name in both the tag and its trigger. Use the same GA4 stream as the existing `generate_lead` tag, safe page parameters and an `analytics_storage` requirement. In Preview, allow analytics on the coverage checklist, answer all three questions and show the result. Verify both tags in Tag Assistant and both events in GA4 DebugView before publishing the container. Leave `generate_lead` as the main key event.
+
 ## Validation
 
 Browser tests stub the GTM script, verify consent gating, one startup and page view, safe event objects, no submitted values/query data, and no separate direct GA4 request. The direct-GA4 form integration suite explicitly disables GTM to preserve its independent coverage. These are local application checks, not evidence of container publication or real GA4 collection.

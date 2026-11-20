@@ -152,7 +152,7 @@ test('GA stays unloaded until permission, then sends one safe page view', async 
   await page.getByRole('button',{name:'Analytics choices',exact:true}).click();
   await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
   await expect.poll(()=>scripts).toBe(1);
-  expect(await eventCalls(page,'page_view')).toEqual([['event','page_view', {
+  await expect.poll(() => eventCalls(page,'page_view')).toEqual([['event','page_view', {
     page_location:'https://kapohari2k.github.io/BUSN9155_Codex/enquire.html',page_referrer:'',page_title:await page.title(),
   }]]);
   const config = (await dataCalls(page)).find(call=>call[0] === 'config');
