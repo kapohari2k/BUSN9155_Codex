@@ -6,12 +6,13 @@ const pages = [
   { file: 'about.html', nav: 'About', heading: 'How Local Lift audits your website' },
   { file: 'audit.html', nav: 'The audit', heading: 'What the website and SEO audit covers' },
   { file: 'sample-audit.html', nav: null, heading: 'Sample website and SEO audit report' },
-  { file: 'coverage-checklist.html', nav: 'Coverage checklist', heading: 'Coverage checklist for Perth cleaners' },
+  { file: 'coverage-checklist.html', nav: null, heading: 'Coverage checklist for Perth cleaners' },
+  { file: 'quote-form-fixer.html', nav: 'Quote form fixer', heading: 'Cleaning Quote Form Fixer' },
   { file: 'enquire.html', nav: 'Enquire', heading: 'Enquire about an audit' },
 ];
 for (const width of [1440, 768, 390, 320]) {
   for (const item of pages) {
-    test(`${item.nav ?? "Sample audit report"}: direct visit, assets, layout and accessibility at ${width}px`, async ({ page }) => {
+    test(`${item.nav ?? item.heading}: direct visit, assets, layout and accessibility at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       const errors: string[] = [];
       const failed: string[] = [];
@@ -92,6 +93,17 @@ for (const [device, width, height] of [['phone', 390, 844], ['tablet', 768, 1024
 
     await page.goto('./');
     await page.locator('.guide-promo').click();
+    await expect(page).toHaveURL(/quote-form-fixer\.html$/);
+    await page.getByRole('button', { name: 'Try an example' }).click();
+    await expect(page.getByRole('heading', {name:'Your quote form draft'})).toBeFocused();
+    await page.getByRole('link', { name: 'View the sample audit' }).click();
+    await expect(page).toHaveURL(/sample-audit\.html#quote-form$/);
+    await page.locator('main a[data-event="enquiry"]').click();
+    await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
+    await expect(page.locator('#email')).toBeInViewport();
+
+    await page.goto('quote-form-fixer.html');
+    await page.getByRole('link', { name: 'Use the coverage checklist' }).click();
     await expect(page.getByRole('link', { name: /Read Google’s official/ })).toHaveAttribute('href', 'https://support.google.com/business/answer/9157481');
     await page.getByRole('link', { name: 'See a worked example' }).click();
     await expect(page).toHaveURL(/coverage-checklist\.html#worked-example$/);
@@ -172,6 +184,81 @@ test('validation is accessible, specific, and retains answers', async ({ page })
   await expect(page.locator('#website')).toHaveValue('javascript:alert(1)');
   const result = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   expect(result.violations).toEqual([]);
+});
+
+test('the quote form draft moves fields based on pricing and offers a copy fallback', async ({ page }) => {
+  await page.setViewportSize({ width:390, height:844 });
+  await page.goto('quote-form-fixer.html');
+  const labels = page.getByLabel('What does your form ask?');
+  const pricing = page.getByLabel('What do you need to price a job?');
+  const draft = page.getByRole('button', {name:'Draft my quote form'});
+  const required = page.locator('#quote-required');
+  const optional = page.locator('#quote-optional');
+  await draft.click();
+  await expect(labels).toBeFocused();
+  await expect(labels).toHaveAttribute('aria-invalid', 'true');
+  await labels.fill('1. Suburb\n2. Floor area (m²) *\n• floor area (optional)\nPhone number\nAccess instructions\nOutdoor steps');
+  await draft.click();
+  await expect(pricing).toBeFocused();
+  await expect(pricing).toHaveAttribute('aria-invalid', 'true');
+
+  await pricing.selectOption('rooms');
+  await draft.click();
+  await expect(required).toContainText('Number of bedrooms');
+  await expect(required).toContainText('Number of bathrooms');
+  await expect(required).toContainText('Phone number');
+  await expect(required).not.toContainText('Email address');
+  await expect(optional.locator('li')).toHaveCount(1);
+  await expect(optional).toContainText('Approximate floor area (if you know it)');
+  await expect(page.locator('#quote-later')).toContainText('Access instructions');
+  await expect(page.locator('#quote-review')).toContainText('Outdoor steps');
+
+  await pricing.selectOption('area');
+  await expect(page.locator('#quote-result')).toBeHidden();
+  await draft.click();
+  await expect(required).toContainText('Approximate floor area (m²)');
+  await expect(required).toContainText('I’m not sure');
+  await expect(page.locator('#quote-optional-group')).toBeHidden();
+  await expect(required).not.toContainText('Number of bedrooms');
+
+  await pricing.selectOption('hourly');
+  await draft.click();
+  await expect(required).toContainText('Which rooms or tasks need cleaning?');
+  await pricing.selectOption('custom');
+  await draft.click();
+  await expect(required.locator('li')).toHaveCount(3);
+  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText: () => Promise.reject(new Error('Clipboard unavailable')) },
+  }));
+  await page.getByRole('button', {name:'Copy form draft'}).click();
+  const plainText = page.getByRole('textbox', {name:'Quote form draft in plain text'});
+  await expect(plainText).toBeFocused();
+  await expect(plainText).toHaveValue(/Ask after the enquiry\n- Access instructions\n  Collect access details[^\n]*\n\nCheck before publishing\n- Outdoor steps/);
+  await expect(plainText).toHaveValue(/Button: Request a cleaning quote/);
+  const accessibility = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(accessibility.violations).toEqual([]);
+});
+
+test('quote form labels stay out of URLs, requests and consented analytics', async ({ page }) => {
+  const requests: string[] = [];
+  await page.route('https://**/*', route => {
+    requests.push(route.request().url());
+    return route.fulfill({ status:200, contentType:'text/javascript', body:'/* isolated GTM stub */' });
+  });
+  await page.goto('quote-form-fixer.html?case=hidden-query#quote-fixer');
+  await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
+  await page.getByLabel('What does your form ask?').fill('Email address\nUnrecognised field <private-fixture>');
+  await page.getByLabel('What do you need to price a job?').selectOption('rooms');
+  await page.getByRole('button', {name:'Draft my quote form'}).click();
+  const entries = () => page.evaluate(() => (window.dataLayer || []).filter(item => typeof item === 'object' && item !== null && 'event' in item) as Record<string,unknown>[]);
+  await expect.poll(async () => (await entries()).find(entry=>entry.event==='page_view')).toMatchObject({
+    page_location:'https://kapohari2k.github.io/BUSN9155_Codex/quote-form-fixer.html', page_referrer:'',
+  });
+  await expect(page.locator('#quote-review')).toContainText('Unrecognised field <private-fixture>');
+  expect(requests).toEqual(['https://www.googletagmanager.com/gtm.js?id=GTM-PG38VX8P']);
+  expect(JSON.stringify(await entries())).not.toMatch(/private-fixture|hidden-query/);
+  expect(page.url()).not.toContain('private-fixture');
 });
 
 test('GTM loads once after consent and receives safe events without direct GA4', async ({ page }) => {

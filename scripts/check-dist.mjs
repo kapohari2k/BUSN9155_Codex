@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const base = process.env.VITE_BASE_PATH || '/BUSN9155_Codex/';
 const site = process.env.VITE_SITE_URL || 'https://kapohari2k.github.io/BUSN9155_Codex/';
-const pages = ['index.html','about.html','audit.html','sample-audit.html','coverage-checklist.html','enquire.html'];
+const pages = ['index.html','about.html','audit.html','sample-audit.html','coverage-checklist.html','quote-form-fixer.html','enquire.html'];
 const titles = new Set();
 const descriptions = new Set();
 let hasIntroVideo = false;
