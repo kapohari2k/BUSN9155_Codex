@@ -53,6 +53,26 @@
   text-decoration: underline;
 }
 
+.home-intro-video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: var(--ink);
+  border-radius: var(--radius);
+}
+
+.home-intro-video video:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.intro-video-transcript summary {
+  margin-bottom: .75rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
 .home-excerpt,
 .audit-excerpt {
   color: var(--ink);

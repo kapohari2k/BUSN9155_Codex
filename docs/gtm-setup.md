@@ -27,6 +27,8 @@ The site emits `coverage_check_start` on the first answer and `coverage_check_co
 
 The existing GTM container has a GA4 Event tag and a Custom Event trigger for each event. Both use the same GA4 stream as `generate_lead`, safe page parameters and an `analytics_storage` requirement. To retest, allow analytics in Preview, confirm actual service coverage, answer the three observation questions and show the result. Verify both tags and their hits in Tag Assistant. `generate_lead` is the main key event.
 
+On 20 November 2026, one controlled visit on the published site appeared in GA4 Realtime as one `coverage_check_start`, one `coverage_check_complete` and one `file_download` for `sample-website-audit-report.pdf`. The existing automatic PDF event can be filtered by `file_name`. The closed coverage exploration uses `page_view` on the checklist URL, then the exact start and completion event names. Realtime test activity does not establish sustained use or a completion rate.
+
 ## Validation
 
 Browser tests stub the GTM script, verify consent gating, one startup and page view, safe event objects, no submitted values/query data, and no separate direct GA4 request. The direct-GA4 form integration suite explicitly disables GTM to preserve its independent coverage. These are local application checks, not evidence of container publication or real GA4 collection.

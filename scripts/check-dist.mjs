@@ -7,6 +7,7 @@ const site = process.env.VITE_SITE_URL || 'https://kapohari2k.github.io/BUSN9155
 const pages = ['index.html','about.html','audit.html','sample-audit.html','coverage-checklist.html','enquire.html'];
 const titles = new Set();
 const descriptions = new Set();
+let hasIntroVideo = false;
 for (const page of pages) {
   const html = await readFile(join('dist', page), 'utf8');
   assert.equal((html.match(/<h1(?:\s[^>]*)?>/g) || []).length, 1, `${page}: one h1`);
@@ -25,7 +26,8 @@ for (const page of pages) {
   for (const [link] of html.matchAll(/<a\b[^>]*\bdata-event="enquiry"[^>]*>/g)) {
     assert.equal(link.match(/\bhref="([^"]+)"/)?.[1], `${base}enquire.html#enquiry-form`, `${page}: enquiry CTA targets the form`);
   }
-  for (const match of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
+  if (page === 'index.html') hasIntroVideo = html.includes('class="intro-video-transcript"');
+  for (const match of html.matchAll(/(?:href|src|poster)="([^"]+)"/g)) {
     const url = match[1];
     if (url.startsWith('#') || /^https?:/.test(url)) continue;
     assert.ok(url.startsWith(base), `${page}: ${url} uses project base`);
@@ -45,5 +47,11 @@ assert.equal(assets.filter(file => file.endsWith('.woff2')).length, 3, 'all impo
 for (const font of ['manrope','newsreader']) assert.ok((await readFile(`dist/assets/font-license-${font}.txt`, 'utf8')).includes('SIL OPEN FONT LICENSE'), `${font} distribution licence`);
 const allowed = new Set([...pages,'assets','resources','sitemap.xml','robots.txt']);
 for (const entry of await readdir('dist')) assert.ok(allowed.has(entry), `unexpected published item: ${entry}`);
-assert.deepEqual((await readdir('dist/resources')).sort(), ['sample-audit-report-cover.webp', 'sample-website-audit-report.pdf']);
+const resources = ['sample-audit-report-cover.webp', 'sample-website-audit-report.pdf'];
+if (hasIntroVideo) {
+  resources.unshift('intro');
+  assert.deepEqual((await readdir('dist/resources/intro')).sort(), ['captions-en.vtt', 'local-lift-intro.mp4', 'poster.webp', 'transcript.txt']);
+  assert.match(await readFile('dist/resources/intro/captions-en.vtt', 'utf8'), /^WEBVTT\b/);
+}
+assert.deepEqual((await readdir('dist/resources')).sort(), resources);
 console.log('PASS: HTML pages, unique metadata, canonical URLs, project-path assets and links, emitted media, sitemap, robots, and publication allowlist.');

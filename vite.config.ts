@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { resolve } from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { analyticsConfig, analyticsStorageKey } from './src/analytics-config.ts';
 
 const pages = [
@@ -8,7 +8,7 @@ const pages = [
   { file: 'about.html', label: 'About', title: 'How Local Lift Audits Perth Cleaning Websites', description: 'See how Local Lift reviews a cleaning business website, checks findings with the owner and prepares specific recommendations for the owner or their web contact to publish.' },
   { file: 'audit.html', label: 'The audit', title: 'Website and SEO Audit Scope for Perth Cleaners | Local Lift', description: 'See what Local Lift checks for Perth cleaners, from service pages and Google Business Profile to mobile loading and quote forms. Read a sample audit report.' },
   { file: 'sample-audit.html', label: 'Sample audit report', title: 'Sample Website and SEO Audit Report for a Perth Cleaner | Local Lift', description: 'Read a sample Local Lift audit report with three worked examples, replacement wording, publishing responsibilities and follow-up checks.' },
-  { file: 'coverage-checklist.html', label: 'Coverage checklist', title: 'Service Area Checklist for Perth Cleaners | Local Lift', description: 'Use this free checklist to update your Perth cleaning service areas across Google Business Profile, your website and your quote-request form.' },
+  { file: 'coverage-checklist.html', label: 'Coverage checklist', title: 'Service Area Checklist for Perth Cleaners | Local Lift', description: 'Check whether customers see the right suburbs on Google, your website and your quote form. Get prioritised next steps for your Perth cleaning business.' },
   { file: 'enquire.html', label: 'Enquire', title: 'Enquire About a Website and SEO Audit | Local Lift', description: 'Tell Local Lift about your Perth cleaning business and what you want checked. Use the short enquiry form to discuss fit and scope before committing.' },
 ];
 
@@ -42,6 +42,38 @@ const preparePageChrome = `<script>
 })();
 </script>`;
 
+function introVideo(base: string): string {
+  const folder = 'resources/intro';
+  const files = ['local-lift-intro.mp4', 'poster.webp', 'captions-en.vtt', 'transcript.txt'];
+  const present = files.filter(file => existsSync(resolve(`public/${folder}/${file}`)));
+  if (!present.length) return '';
+  if (present.length !== files.length) throw new Error('The intro video needs its MP4, poster, captions and transcript together.');
+  const text = readFileSync(resolve(`public/${folder}/transcript.txt`), 'utf8').trim();
+  if (!text) throw new Error('The intro video transcript is empty.');
+  const transcript = text.split(/\r?\n\s*\r?\n/).map(paragraph =>
+    `<p>${paragraph.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>`,
+  ).join('');
+  return `<section class="section container split-section home-intro-video" aria-labelledby="intro-video-heading">
+    <div>
+      <h2 id="intro-video-heading">What a customer sees before they enquire</h2>
+      <p>See how Local Lift reviews the path from Google to your quote form.</p>
+      <a class="text-link" href="${base}sample-audit.html" data-event="sample" data-placement="home-video">Read the sample audit report</a>
+    </div>
+    <div>
+      <video controls playsinline preload="none" width="960" height="540" poster="${base}${folder}/poster.webp" aria-labelledby="intro-video-heading">
+        <source src="${base}${folder}/local-lift-intro.mp4" type="video/mp4">
+        <track kind="captions" label="English" srclang="en" src="${base}${folder}/captions-en.vtt">
+        <a href="${base}${folder}/local-lift-intro.mp4">Download the intro video</a>
+      </video>
+      <p class="caption">Presented by a fictional, AI-generated spokesperson.</p>
+      <details class="intro-video-transcript">
+        <summary>Read the video transcript</summary>
+        ${transcript}
+      </details>
+    </div>
+  </section>`;
+}
+
 function siteChrome(base: string, siteUrl: string, showAnalyticsChoices: boolean): Plugin {
   const href = (file: string) => `${base}${file === 'index.html' ? '' : file}`;
   const enquiryHref = `${href('enquire.html')}#enquiry-form`;
@@ -59,7 +91,8 @@ function siteChrome(base: string, siteUrl: string, showAnalyticsChoices: boolean
         const canonical = new URL(page.file === 'index.html' ? '' : page.file, siteUrl).href;
         return html.replace('<!-- site:head -->', `<title>${page.title}</title><meta name="description" content="${page.description}"><link rel="canonical" href="${canonical}"><meta property="og:type" content="website"><meta property="og:site_name" content="Local Lift"><meta property="og:title" content="${page.title}"><meta property="og:description" content="${page.description}"><meta property="og:url" content="${canonical}"><meta name="theme-color" content="#193b35">`)
           .replace('<!-- site:header -->', header + (showAnalyticsChoices ? analyticsPanel : '') + preparePageChrome).replace('<!-- site:footer -->', footer)
-          .replaceAll('href="@/', `href="${base}`);
+          .replaceAll('href="@/', `href="${base}`)
+          .replace('<!-- site:intro-video -->', () => page.file === 'index.html' ? introVideo(base) : '');
       },
     },
     generateBundle() {

@@ -3,7 +3,7 @@ import { analyticsConfig, analyticsStorageKey as storageKey } from './analytics-
 
 type EventName = 'enquiry_cta_click' | 'sample_select' | 'guide_select' | 'form_start' | 'form_error' | 'generate_lead'
   | 'coverage_check_start' | 'coverage_check_complete';
-const allowedLabels = ['header', 'footer', 'home-hero', 'home-guide', 'home-close', 'about-sample', 'about-guide', 'about-enquiry', 'audit-intro', 'audit-report', 'audit-contents', 'audit-close', 'guide-close', 'enquire-aside', 'enquire-success', 'report-coverage', 'report-close'] as const;
+const allowedLabels = ['header', 'footer', 'home-hero', 'home-guide', 'home-close', 'home-video', 'about-sample', 'about-guide', 'about-enquiry', 'audit-intro', 'audit-report', 'audit-contents', 'audit-close', 'guide-close', 'enquire-aside', 'enquire-success', 'report-coverage', 'report-close'] as const;
 type SafeLabel = typeof allowedLabels[number];
 export type ErrorCategory = 'validation' | 'unavailable' | 'network' | 'service' | 'unconfirmed' | 'timeout';
 type EventParameters = { placement?: SafeLabel; error_category?: ErrorCategory };
