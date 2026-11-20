@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const base = process.env.VITE_BASE_PATH || '/BUSN9155_Codex/';
 const site = process.env.VITE_SITE_URL || 'https://kapohari2k.github.io/BUSN9155_Codex/';
-const pages = ['index.html','about.html','audit.html','sample-audit.html','coverage-checklist.html','quote-form-fixer.html','enquire.html'];
+const pages = ['index.html','about.html','audit.html','sample-audit.html','coverage-checklist.html','enquire.html'];
 const titles = new Set();
 const descriptions = new Set();
 let hasIntroVideo = false;
@@ -49,7 +49,9 @@ const assets = await readdir('dist/assets');
 assert.ok(assets.some(file => file.endsWith('.svg')), 'imported favicon emitted');
 assert.equal(assets.filter(file => file.endsWith('.woff2')).length, 3, 'all imported fonts emitted');
 for (const font of ['manrope','newsreader']) assert.ok((await readFile(`dist/assets/font-license-${font}.txt`, 'utf8')).includes('SIL OPEN FONT LICENSE'), `${font} distribution licence`);
-const allowed = new Set([...pages,'assets','resources','sitemap.xml','robots.txt']);
+const retiredQuoteTool = await readFile('dist/quote-form-fixer.html', 'utf8');
+assert.ok(retiredQuoteTool.includes('noindex') && retiredQuoteTool.includes('url=./coverage-checklist.html'), 'retired offer points to the coverage checklist');
+const allowed = new Set([...pages,'assets','resources','sitemap.xml','robots.txt','quote-form-fixer.html']);
 for (const entry of await readdir('dist')) assert.ok(allowed.has(entry), `unexpected published item: ${entry}`);
 const resources = ['sample-audit-report-cover.webp', 'sample-website-audit-report.pdf'];
 if (hasIntroVideo) {

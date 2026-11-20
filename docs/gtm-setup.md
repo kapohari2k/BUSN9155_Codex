@@ -1,6 +1,6 @@
 # Google Tag Manager integration, 9 November 2026
 
-The site now loads the user-supplied public container **GTM-PG38VX8P** after analytics opt-in, on all five pages. The site's shared module uses the standard `gtm.start` / `gtm.js` startup event and asynchronous container script. The submitted snippet mixed the GTM script with a `gtag('js', ...)` command; GTM startup is used instead. No unconditional noscript iframe is included because it would bypass the site's consent choice.
+The site now loads the user-supplied public container **GTM-PG38VX8P** after analytics opt-in, on all six pages. The site's shared module uses the standard `gtm.start` / `gtm.js` startup event and asynchronous container script. The submitted snippet mixed the GTM script with a `gtag('js', ...)` command; GTM startup is used instead. No unconditional noscript iframe is included because it would bypass the site's consent choice.
 
 `VITE_GTM_CONTAINER_ID` defaults to this container and is explicitly set in the Pages workflow. GTM takes precedence over `VITE_GA4_MEASUREMENT_ID`, so the app cannot load both the container and a separate direct GA4 script. To use the older direct GA4 implementation instead, explicitly set `VITE_GTM_CONTAINER_ID` to an empty string when building, and supply a real GA4 ID. Set both variables empty to disable both integrations.
 
@@ -23,7 +23,7 @@ The [measurement plan](measurement-plan.md) defines triggers and decisions. Earl
 
 ## Guided coverage check events
 
-The site emits `coverage_check_start` on the first answer and `coverage_check_complete` on the first result shown, at most once each per page load and only with analytics consent. The data layer contains the event name and safe page context. The check's answers stay in the browser.
+The site emits `coverage_check_start` on the first edit or use of the example and `coverage_check_complete` on the first valid coverage update, at most once each per page load and only with analytics consent. The data layer contains the event name and safe page context. The check's answers stay in the browser.
 
 The existing GTM container has a GA4 Event tag and a Custom Event trigger for each event. Both use the same GA4 stream as `generate_lead`, safe page parameters and an `analytics_storage` requirement. To retest, allow analytics in Preview, confirm actual service coverage, answer the three observation questions and show the result. Verify both tags and their hits in Tag Assistant. `generate_lead` is the main key event.
 

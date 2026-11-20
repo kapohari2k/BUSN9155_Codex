@@ -12,7 +12,7 @@
 <main id="main" class="service-page" tabindex="-1">
   <section class="page-intro container checklist-intro">
     <h1>Coverage checklist for Perth cleaners</h1>
-    <p class="lede">Changed where you work? Use this free checklist to update the suburbs on your Google Business Profile, website and quote form.</p>
+    <p class="lede">Turn the suburbs you serve into website and quote form wording. Use the checklist below to keep that information consistent with your Google Business Profile.</p>
     <div class="button-group">
       <a class="text-link" href="#checklist-heading">Go to the five-step checklist</a>
       <a class="text-link" href="#worked-example">See a worked example <span aria-hidden="true">↓</span></a>
@@ -22,58 +22,92 @@
 
   <section class="container coverage-check" aria-labelledby="coverage-check-heading" hidden>
     <div class="coverage-check-intro">
-      <h2 id="coverage-check-heading" tabindex="-1">Check one service and suburb</h2>
-      <p>Pick a service and suburb. Confirm whether you offer the service there, then look up what a customer can see or do. The check compares your answers and shows what to fix first.</p>
+      <h2 id="coverage-check-heading" tabindex="-1">Build your coverage update</h2>
+      <p>Choose one cleaning service and enter the suburbs you serve. Get wording for your website and quote form, plus the checks to make before publishing.</p>
     </div>
-    <form id="coverage-check-form" autocomplete="off">
-      <fieldset>
-        <legend>Do you offer that service in the suburb?</legend>
-        <div class="coverage-options">
-          <label><input type="radio" name="serves" value="yes" required> Yes</label>
-          <label><input type="radio" name="serves" value="no"> No</label>
+    <form id="coverage-check-form" autocomplete="off" novalidate>
+      <div class="coverage-inputs">
+        <div>
+          <label for="coverage-service">Cleaning service</label>
+          <input id="coverage-service" type="text" maxlength="75" required placeholder="e.g. Regular house cleaning" aria-describedby="coverage-service-error">
+          <p id="coverage-service-error" class="coverage-error" hidden></p>
         </div>
-      </fieldset>
-      <fieldset aria-describedby="coverage-profile-hint">
-        <legend>What does your Google Business Profile show?</legend>
-        <p id="coverage-profile-hint">Look up your public listing. Count the suburb as included if a listed area clearly covers it.</p>
-        <div class="coverage-options">
-          <label><input type="radio" name="profile" value="yes" required> Suburb included</label>
-          <label><input type="radio" name="profile" value="no"> Suburb missing from the list</label>
-          <label><input type="radio" name="profile" value="unclear"> Can’t tell</label>
+        <div>
+          <label for="coverage-suburbs">Suburbs you serve for this service</label>
+          <textarea id="coverage-suburbs" rows="3" maxlength="1600" required placeholder="e.g. Maylands, Bayswater" aria-describedby="coverage-suburbs-hint coverage-suburbs-error"></textarea>
+          <p id="coverage-suburbs-hint" class="coverage-note">Enter names as you want them published, separated by commas or new lines.</p>
+          <p id="coverage-suburbs-error" class="coverage-error" hidden></p>
         </div>
-      </fieldset>
-      <fieldset aria-describedby="coverage-website-hint">
-        <legend>What does your website say?</legend>
-        <p id="coverage-website-hint">Read the service and coverage pages. A claim like “all of Perth” gives customers reason to expect coverage in that suburb.</p>
-        <div class="coverage-options">
-          <label><input type="radio" name="website" value="yes" required> Says you cover it</label>
-          <label><input type="radio" name="website" value="no"> Says it’s outside your area</label>
-          <label><input type="radio" name="website" value="unclear"> Unclear or conflicting</label>
+      </div>
+      <details id="coverage-compare" class="coverage-compare">
+        <summary>Compare existing lists (optional)</summary>
+        <p>Paste area names from any of the three places. Leave a field blank to skip it.</p>
+        <div class="coverage-inputs coverage-channels">
+          <div>
+            <label for="coverage-quote">Quote form options</label>
+            <textarea id="coverage-quote" rows="3" maxlength="3000" aria-describedby="coverage-quote-hint coverage-quote-error"></textarea>
+            <p id="coverage-quote-hint" class="coverage-note">Use the options for this service. Skip this if customers type their suburb.</p>
+            <p id="coverage-quote-error" class="coverage-error" hidden></p>
+          </div>
+          <div>
+            <label for="coverage-website">Website coverage list</label>
+            <textarea id="coverage-website" rows="3" maxlength="3000" aria-describedby="coverage-website-hint coverage-website-error"></textarea>
+            <p id="coverage-website-hint" class="coverage-note">Use the list on the page for this service.</p>
+            <p id="coverage-website-error" class="coverage-error" hidden></p>
+          </div>
+          <div>
+            <label for="coverage-profile">Google Business Profile areas</label>
+            <textarea id="coverage-profile" rows="3" maxlength="3000" aria-describedby="coverage-profile-hint coverage-profile-error"></textarea>
+            <p id="coverage-profile-hint" class="coverage-note">Google’s areas can also cover your other services.</p>
+            <p id="coverage-profile-error" class="coverage-error" hidden></p>
+          </div>
         </div>
-      </fieldset>
-      <fieldset aria-describedby="coverage-quote-hint">
-        <legend>Can a customer start a quote for that suburb?</legend>
-        <p id="coverage-quote-hint">On your phone, choose the service and try entering or selecting the suburb. Check what the form tells you before sending anything.</p>
-        <div class="coverage-options">
-          <label><input type="radio" name="quote" value="yes" required> Form accepts the suburb</label>
-          <label><input type="radio" name="quote" value="no"> Form blocks the suburb</label>
-          <label><input type="radio" name="quote" value="unclear"> Can’t tell</label>
-        </div>
-      </fieldset>
-      <button type="submit" class="button">Show my next steps</button>
-      <p class="coverage-note">Your answers stay in this browser.</p>
+      </details>
+      <div class="button-group">
+        <button type="submit" class="button">Build my coverage update</button>
+        <button type="button" class="text-link" id="coverage-example">Try the Maylands example</button>
+      </div>
+      <p class="coverage-note">Entries stay in your browser.</p>
     </form>
 
     <section id="coverage-result" class="coverage-result" aria-labelledby="coverage-result-heading" hidden>
-      <h3 id="coverage-result-heading" tabindex="-1">Your next steps</h3>
-      <p id="coverage-matches" hidden>Your answers point to consistent coverage for this service and suburb. Repeat the check for another suburb or after your service area changes.</p>
-      <ol id="coverage-actions" hidden></ol>
-      <p id="coverage-retest" hidden>After publishing a change, check the public information and walk through the quote form again on your phone.</p>
-      <div class="coverage-audit">
-        <p>Checked one suburb? The full Local Lift audit follows the customer journey from Google to your quote form. You get a prioritised list of fixes and suggested wording you can use.</p>
-        <a class="text-link" href="@/audit.html">See what the full audit covers</a>
+      <div class="coverage-result-head">
+        <div>
+          <h3 id="coverage-result-heading" tabindex="-1">Your coverage update</h3>
+          <p id="coverage-result-summary"></p>
+        </div>
+        <div>
+          <button type="button" class="button" id="coverage-copy">Copy update plan</button>
+          <p id="coverage-copy-status" class="coverage-note" role="status"></p>
+        </div>
       </div>
-      <button type="button" class="text-link" id="coverage-restart">Check another service or suburb</button>
+      <div class="coverage-cards">
+        <div class="coverage-card">
+          <h4>Website copy</h4>
+          <p id="coverage-site-copy" class="coverage-copy"></p>
+          <p>Place this beside the quote button on the relevant service page.</p>
+        </div>
+        <div class="coverage-card">
+          <h4>Quote form helper text</h4>
+          <p id="coverage-form-copy" class="coverage-copy"></p>
+          <p>Place this by the suburb field. If the form uses a list, check it against the service selected.</p>
+        </div>
+      </div>
+      <div class="coverage-actions">
+        <h4>What to check before publishing</h4>
+        <ol id="coverage-actions"></ol>
+        <p class="coverage-note">The comparison uses the names you enter. Check wider areas, postcodes and differently named places before changing a list.</p>
+        <p>After publishing, try one suburb you serve and one you don’t on a phone. Check that each sees the right next step.</p>
+      </div>
+      <details class="coverage-compare" id="coverage-plain">
+        <summary>View the plan as plain text</summary>
+        <label for="coverage-plan-text" class="sr-only">Coverage update plan</label>
+        <textarea id="coverage-plan-text" rows="12" readonly></textarea>
+      </details>
+      <div class="coverage-audit">
+        <a class="text-link" href="@/sample-audit.html#service-area" data-event="sample" data-placement="guide-sample">See the service-area fix in the sample audit <span aria-hidden="true">↗</span></a>
+        <button type="button" class="text-link" id="coverage-restart">Start another coverage update</button>
+      </div>
     </section>
   </section>
 
@@ -139,14 +173,14 @@
         <h2>Updating coverage after a change</h2>
       </div>
       <div class="example-content">
-        <p>An owner confirms that their standard home cleaning service now covers Maylands and Bayswater. The website still says “all of Perth”, and the quote form lists a suburb they no longer serve.</p>
+        <p>An owner confirms regular house cleaning in Maylands and Bayswater. The website and quote form still list Inglewood. The Google Business Profile lists Maylands and Bayswater.</p>
         <div class="example-note">
           <p class="annotation">Suggested website wording</p>
-          <p>“Our standard home cleaning service covers Maylands and Bayswater. Include your suburb in your quote request so we can confirm availability.”</p>
+          <p>“We provide regular house cleaning in Maylands and Bayswater.”</p>
         </div>
         <ul class="check-list">
           <li>The owner checks the confirmed areas against the public profile and updates it using Google’s guidance.</li>
-          <li>The owner or web contact replaces the broad website statement, reviews any affected titles and removes the outdated quote-form option.</li>
+          <li>The owner or web contact replaces the outdated website list and removes Inglewood from the quote choices for this service.</li>
           <li>The owner checks public information and the quote path after publishing.</li>
         </ul>
       </div>

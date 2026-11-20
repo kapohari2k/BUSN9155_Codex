@@ -9,102 +9,117 @@
 
 .coverage-check h2 {
   font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 1rem;
+  margin-bottom: .7rem;
 }
 
-.coverage-check-intro,
-.coverage-check form,
-.coverage-result {
-  max-width: 68ch;
+.coverage-check-intro { max-width: 72ch; }
+
+.coverage-inputs,
+.coverage-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
 }
 
-.coverage-check fieldset {
-  min-inline-size: 0;
-  padding: 0 0 1.2rem;
-  margin: 0;
-  border: 0;
-}
-
-.coverage-check legend {
-  padding: 0;
+.coverage-inputs label {
+  display: block;
+  margin-bottom: .25rem;
   font-weight: 800;
 }
 
-.coverage-check fieldset p {
-  margin-bottom: .5rem;
-}
-
-.coverage-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .4rem;
-}
-
-.coverage-options label {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
+.coverage-check input,
+.coverage-check textarea {
+  display: block;
+  width: 100%;
   min-height: 44px;
-  padding: .4rem .65rem;
-  border: 1px solid var(--line);
+  padding: .55rem .7rem;
+  border: 1px solid #73837b;
   border-radius: var(--radius);
-  font-size: .9rem;
-  line-height: 1.4;
-  cursor: pointer;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 1rem;
 }
 
-.coverage-options input {
-  flex: none;
-  margin: 0;
-  inline-size: 1em;
-  block-size: 1em;
-  accent-color: var(--ink);
-}
+.coverage-check textarea { resize: vertical; }
+.coverage-check textarea::placeholder,
+.coverage-check input::placeholder { color: var(--muted); }
+.coverage-check [aria-invalid="true"] { border-color: #a1312b; }
 
-.coverage-options label:has(input:checked) {
-  background: var(--surface);
-  border-color: var(--ink);
-}
-
-.coverage-note {
-  margin: .55rem 0 0;
+.coverage-note,
+.coverage-error {
+  margin: .38rem 0 0;
   color: var(--muted);
   font-size: .875rem;
 }
 
+.coverage-error { color: #a1312b; font-weight: 750; }
+.coverage-check form > .coverage-note { margin-top: .8rem; }
+.coverage-check .text-link { min-height: 44px; text-decoration: underline; }
+
+.coverage-compare { margin: 1rem 0; }
+.coverage-compare summary {
+  width: fit-content;
+  padding: .65rem 0;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.coverage-compare[open] summary { margin-bottom: .35rem; }
+.coverage-channels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
 .coverage-result {
-  margin-top: 1.3rem;
-  padding: clamp(.85rem, 3vw, 1.5rem);
+  margin-top: 1.6rem;
+  padding: clamp(.9rem, 3vw, 1.5rem);
   border-radius: var(--radius);
   background: var(--surface);
+  overflow-wrap: anywhere;
 }
 
-.coverage-result ol {
-  padding-inline-start: 1.35em;
+.coverage-result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.coverage-result li + li {
-  margin-top: .55rem;
+.coverage-result-head h3 { font-size: clamp(1.4rem, 2.6vw, 2rem); margin-bottom: .35rem; }
+.coverage-result-head > div:last-child { flex-shrink: 0; }
+.coverage-result-head p { margin-bottom: 0; }
+#coverage-copy-status:empty { margin: 0; }
+
+.coverage-card {
+  height: 100%;
+  padding: clamp(.8rem, 2.5vw, 1.35rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
 }
+
+.coverage-card h4,
+.coverage-actions h4 { margin-bottom: .35rem; }
+.coverage-card p:last-child { margin-bottom: 0; }
+.coverage-copy { font-weight: 780; }
+.coverage-actions { margin-block: 1.15rem; }
+.coverage-actions ol { margin: .2rem 0 .7rem; padding-inline-start: 1.25rem; }
+.coverage-actions li { margin-bottom: .6rem; white-space: pre-line; }
+.coverage-actions > p + p { margin-top: .65rem; }
 
 .coverage-audit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .3rem 1.2rem;
   border-top: 1px solid var(--line);
-  padding-top: 1rem;
+  padding-top: .45rem;
 }
 
-.coverage-audit p {
-  margin-bottom: .25rem;
-}
-
-.coverage-result .text-link {
-  min-height: 44px;
-  text-decoration: underline;
-}
-
-#coverage-restart {
-  display: block;
-  margin-top: .25rem;
-  text-align: start;
+@media (max-width: 700px) {
+  .coverage-inputs,
+  .coverage-cards { grid-template-columns: minmax(0, 1fr); }
+  .coverage-result-head { flex-direction: column; }
 }
 
 @media print {

@@ -13,13 +13,12 @@ test('guided coverage events require consent and contain only safe page context'
     containerLoads++;
     return route.fulfill({ contentType: 'text/javascript', body: '/* GTM test stub */' });
   });
-  const nextSteps = page.getByRole('button', { name: 'Show my next steps' });
+  const nextSteps = page.getByRole('button', { name: 'Build my coverage update' });
   const finishCheck = async () => {
-    for (const name of ['Yes', 'Suburb included', 'Says it’s outside your area', 'Form blocks the suburb']) {
-      await page.getByRole('radio', { name, exact: true }).check();
-    }
+    await page.getByLabel('Cleaning service', { exact: true }).fill('fixture-private-service');
+    await page.getByLabel('Suburbs you serve for this service').fill('fixture-private-suburb, Bayswater');
     await nextSteps.click();
-    await expect(page.getByRole('heading', { name: 'Your next steps' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your coverage update', exact: true })).toBeVisible();
   };
 
   await page.goto('coverage-checklist.html');
@@ -33,7 +32,7 @@ test('guided coverage events require consent and contain only safe page context'
   await page.goto('coverage-checklist.html?suburb=fixture-marker#coverage-check-heading');
   await finishCheck();
   await nextSteps.click();
-  await page.getByRole('button', { name: 'Check another service or suburb' }).click();
+  await page.getByRole('button', { name: 'Start another coverage update' }).click();
   await finishCheck();
 
   const events = await page.evaluate(() => window.dataLayer?.filter(entry =>

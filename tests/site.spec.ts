@@ -6,13 +6,12 @@ const pages = [
   { file: 'about.html', nav: 'About', heading: 'How Local Lift audits your website' },
   { file: 'audit.html', nav: 'The audit', heading: 'What the website and SEO audit covers' },
   { file: 'sample-audit.html', nav: null, heading: 'Sample website and SEO audit report' },
-  { file: 'coverage-checklist.html', nav: null, heading: 'Coverage checklist for Perth cleaners' },
-  { file: 'quote-form-fixer.html', nav: 'Quote form fixer', heading: 'Cleaning Quote Form Fixer' },
+  { file: 'coverage-checklist.html', nav: 'Coverage checklist', heading: 'Coverage checklist for Perth cleaners' },
   { file: 'enquire.html', nav: 'Enquire', heading: 'Enquire about an audit' },
 ];
 for (const width of [1440, 768, 390, 320]) {
   for (const item of pages) {
-    test(`${item.nav ?? item.heading}: direct visit, assets, layout and accessibility at ${width}px`, async ({ page }) => {
+    test(`${item.nav ?? "Sample audit report"}: direct visit, assets, layout and accessibility at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       const errors: string[] = [];
       const failed: string[] = [];
@@ -93,23 +92,12 @@ for (const [device, width, height] of [['phone', 390, 844], ['tablet', 768, 1024
 
     await page.goto('./');
     await page.locator('.guide-promo').click();
-    await expect(page).toHaveURL(/quote-form-fixer\.html$/);
-    await page.getByRole('button', { name: 'Try an example' }).click();
-    await expect(page.getByRole('heading', {name:'Your quote form draft'})).toBeFocused();
-    await page.getByRole('link', { name: 'View the sample audit' }).click();
-    await expect(page).toHaveURL(/sample-audit\.html#quote-form$/);
-    await page.locator('main a[data-event="enquiry"]').click();
-    await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
-    await expect(page.locator('#email')).toBeInViewport();
-
-    await page.goto('quote-form-fixer.html');
-    await page.getByRole('link', { name: 'Use the coverage checklist' }).click();
     await expect(page.getByRole('link', { name: /Read Google’s official/ })).toHaveAttribute('href', 'https://support.google.com/business/answer/9157481');
-    await page.getByRole('link', { name: 'See a worked example' }).click();
-    await expect(page).toHaveURL(/coverage-checklist\.html#worked-example$/);
-    await page.getByRole('link', { name: 'Explore the audit', exact: true }).first().click();
-    await expect(page).toHaveURL(/audit\.html$/);
-    await page.locator('main a[data-event="enquiry"]').first().click();
+    await page.getByRole('button', { name: 'Try the Maylands example' }).click();
+    await expect(page.locator('#coverage-result-heading')).toBeFocused();
+    await page.getByRole('link', { name: /See the service-area fix/ }).click();
+    await expect(page).toHaveURL(/sample-audit\.html#service-area$/);
+    await page.locator('main a[data-event="enquiry"]').click();
     await expect(page).toHaveURL(/enquire\.html#enquiry-form$/);
     await expect(page.locator('#email')).toBeInViewport();
   });
@@ -186,81 +174,6 @@ test('validation is accessible, specific, and retains answers', async ({ page })
   expect(result.violations).toEqual([]);
 });
 
-test('the quote form draft moves fields based on pricing and offers a copy fallback', async ({ page }) => {
-  await page.setViewportSize({ width:390, height:844 });
-  await page.goto('quote-form-fixer.html');
-  const labels = page.getByLabel('What does your form ask?');
-  const pricing = page.getByLabel('What do you need to price a job?');
-  const draft = page.getByRole('button', {name:'Draft my quote form'});
-  const required = page.locator('#quote-required');
-  const optional = page.locator('#quote-optional');
-  await draft.click();
-  await expect(labels).toBeFocused();
-  await expect(labels).toHaveAttribute('aria-invalid', 'true');
-  await labels.fill('1. Suburb\n2. Floor area (m²) *\n• floor area (optional)\nPhone number\nAccess instructions\nOutdoor steps');
-  await draft.click();
-  await expect(pricing).toBeFocused();
-  await expect(pricing).toHaveAttribute('aria-invalid', 'true');
-
-  await pricing.selectOption('rooms');
-  await draft.click();
-  await expect(required).toContainText('Number of bedrooms');
-  await expect(required).toContainText('Number of bathrooms');
-  await expect(required).toContainText('Phone number');
-  await expect(required).not.toContainText('Email address');
-  await expect(optional.locator('li')).toHaveCount(1);
-  await expect(optional).toContainText('Approximate floor area (if you know it)');
-  await expect(page.locator('#quote-later')).toContainText('Access instructions');
-  await expect(page.locator('#quote-review')).toContainText('Outdoor steps');
-
-  await pricing.selectOption('area');
-  await expect(page.locator('#quote-result')).toBeHidden();
-  await draft.click();
-  await expect(required).toContainText('Approximate floor area (m²)');
-  await expect(required).toContainText('I’m not sure');
-  await expect(page.locator('#quote-optional-group')).toBeHidden();
-  await expect(required).not.toContainText('Number of bedrooms');
-
-  await pricing.selectOption('hourly');
-  await draft.click();
-  await expect(required).toContainText('Which rooms or tasks need cleaning?');
-  await pricing.selectOption('custom');
-  await draft.click();
-  await expect(required.locator('li')).toHaveCount(3);
-  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', {
-    configurable: true,
-    value: { writeText: () => Promise.reject(new Error('Clipboard unavailable')) },
-  }));
-  await page.getByRole('button', {name:'Copy form draft'}).click();
-  const plainText = page.getByRole('textbox', {name:'Quote form draft in plain text'});
-  await expect(plainText).toBeFocused();
-  await expect(plainText).toHaveValue(/Ask after the enquiry\n- Access instructions\n  Collect access details[^\n]*\n\nCheck before publishing\n- Outdoor steps/);
-  await expect(plainText).toHaveValue(/Button: Request a cleaning quote/);
-  const accessibility = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
-  expect(accessibility.violations).toEqual([]);
-});
-
-test('quote form labels stay out of URLs, requests and consented analytics', async ({ page }) => {
-  const requests: string[] = [];
-  await page.route('https://**/*', route => {
-    requests.push(route.request().url());
-    return route.fulfill({ status:200, contentType:'text/javascript', body:'/* isolated GTM stub */' });
-  });
-  await page.goto('quote-form-fixer.html?case=hidden-query#quote-fixer');
-  await page.getByRole('button',{name:'Allow analytics',exact:true}).click();
-  await page.getByLabel('What does your form ask?').fill('Email address\nUnrecognised field <private-fixture>');
-  await page.getByLabel('What do you need to price a job?').selectOption('rooms');
-  await page.getByRole('button', {name:'Draft my quote form'}).click();
-  const entries = () => page.evaluate(() => (window.dataLayer || []).filter(item => typeof item === 'object' && item !== null && 'event' in item) as Record<string,unknown>[]);
-  await expect.poll(async () => (await entries()).find(entry=>entry.event==='page_view')).toMatchObject({
-    page_location:'https://kapohari2k.github.io/BUSN9155_Codex/quote-form-fixer.html', page_referrer:'',
-  });
-  await expect(page.locator('#quote-review')).toContainText('Unrecognised field <private-fixture>');
-  expect(requests).toEqual(['https://www.googletagmanager.com/gtm.js?id=GTM-PG38VX8P']);
-  expect(JSON.stringify(await entries())).not.toMatch(/private-fixture|hidden-query/);
-  expect(page.url()).not.toContain('private-fixture');
-});
-
 test('GTM loads once after consent and receives safe events without direct GA4', async ({ page }) => {
   const requests: string[] = [];
   await page.route('https://**/*', route => {
@@ -332,94 +245,85 @@ test('content remains available and navigation works without JavaScript', async 
   await context.close();
 });
 
-test('guided coverage check supports keyboard use and leads to the sample PDF', async ({ page }) => {
+test('coverage update supports keyboard use and leads to the downloadable sample', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('coverage-checklist.html');
   await page.getByRole('button', { name: 'Continue without analytics' }).click();
-  const submit = page.getByRole('button', { name: 'Show my next steps' });
-  const result = page.getByRole('region', { name: 'Your next steps' });
-  const serves = page.getByRole('radio', { name: 'Yes', exact: true });
+  const submit = page.getByRole('button', { name: 'Build my coverage update' });
+  const result = page.getByRole('region', { name: 'Your coverage update', exact: true });
+  const service = page.getByLabel('Cleaning service', { exact: true });
+  const suburbs = page.getByLabel('Suburbs you serve for this service');
   await submit.click();
   await expect(result).toBeHidden();
-  await expect(serves).toBeFocused();
-  await page.keyboard.press('Space');
+  await expect(service).toBeFocused();
+  await page.keyboard.type('Regular house cleaning');
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('radio', { name: 'Suburb included', exact: true })).toBeFocused();
-  await page.keyboard.press('Space');
-  for (const [first, selected] of [
-    ['Says you cover it', 'Says it’s outside your area'],
-    ['Form accepts the suburb', 'Form blocks the suburb'],
-  ]) {
-    await page.keyboard.press('Tab');
-    await expect(page.getByRole('radio', { name: first, exact: true })).toBeFocused();
-    await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('radio', { name: selected, exact: true })).toBeChecked();
-  }
-  await page.keyboard.press('Tab');
-  await expect(submit).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(result.getByRole('heading')).toBeFocused();
-  await expect(result.getByRole('heading')).toBeInViewport();
-  await expect(result.getByRole('listitem')).toHaveText([/^Unblock quote requests/, /^Add the suburb to the relevant service page/]);
-  await expect(result.getByText(/move on to the contact details/)).toBeVisible();
-  await expect(result.getByText(/We offer \[service\] in \[suburb\]/)).toBeVisible();
-  await expect(result.getByText(/After publishing a change/)).toBeVisible();
+  await expect(suburbs).toBeFocused();
+  await suburbs.fill('Maylands, Bayswater');
+  await submit.press('Enter');
+  await expect(result.getByRole('heading', { name: 'Your coverage update' })).toBeFocused();
+  await expect(result.getByRole('heading', { name: 'Your coverage update' })).toBeInViewport();
+  await expect(result.getByText('We provide regular house cleaning in Maylands and Bayswater.')).toBeVisible();
+  await expect(result.locator('#coverage-form-copy')).toContainText('Enter your suburb');
+  await expect(result.locator('#coverage-actions li')).toHaveCount(3);
   const a11y = await new AxeBuilder({ page }).include('.coverage-check')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(a11y.violations).toEqual([]);
-  await page.keyboard.press('Tab');
-  const audit = result.getByRole('link', { name: 'See what the full audit covers' });
-  await expect(audit).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/audit\.html$/);
-  await page.locator('main a[href$="sample-audit.html"]').first().click();
+
+  const sample = result.getByRole('link', { name: /See the service-area fix/ });
+  await sample.press('Enter');
+  await expect(page).toHaveURL(/sample-audit\.html#service-area$/);
   const pdf = page.getByRole('link', { name: /Download sample report/ });
   const [download] = await Promise.all([page.waitForEvent('download'), pdf.click()]);
   expect(download.suggestedFilename()).toBe('sample-website-audit-report.pdf');
   expect(await download.failure()).toBeNull();
 });
 
-test('guided coverage advice reflects all answer combinations and supports another check', async ({ page }) => {
+test('coverage update prioritises quote gaps, handles wider Google areas and offers a copy fallback', async ({ page }) => {
   await page.goto('coverage-checklist.html');
   const form = page.locator('#coverage-check-form');
-  const result = page.getByRole('region', { name: 'Your next steps' });
-  const statuses = ['yes', 'no', 'unclear'] as const;
-  const combinations = statuses.flatMap(quote => statuses.flatMap(website => statuses.map(profile => ({ quote, website, profile }))));
-  const recommendations = {
-    quote: ['Unblock quote requests', 'Show the service exclusion', 'Check what happens'],
-    website: ['Add the suburb', 'Replace the coverage claim', 'Answer the coverage question'],
-    profile: ['Review the missing area', 'Check whether any other service', 'Check the service areas'],
-  } as const;
-  const channels = ['quote', 'website', 'profile'] as const;
-  for (const serves of ['yes', 'no'] as const) {
-    for (const observations of combinations) {
-      const mismatches = channels.filter(channel => observations[channel] === (serves === 'yes' ? 'no' : 'yes'));
-      const followUps = channels.filter(channel => observations[channel] === 'unclear');
-      const titles = [
-        ...mismatches.map(channel => recommendations[channel][serves === 'yes' ? 0 : 1]),
-        ...followUps.map(channel => recommendations[channel][2]),
-      ];
-      await form.evaluate((element: HTMLFormElement, answerMap) => {
-        for (const [key, value] of Object.entries(answerMap)) {
-          const input = element.querySelector<HTMLInputElement>(`[name="${key}"][value="${value}"]`)!;
-          input.click();
-        }
-        element.requestSubmit();
-      }, { serves, ...observations });
-      await expect(result).toBeVisible();
-      await expect(result.locator('li strong')).toHaveText(titles.map(title => new RegExp(`^${title}`)));
-      expect(await result.getByText(/point to consistent coverage/).isVisible()).toBe(titles.length === 0);
-      expect(await result.getByText(/After publishing a change/).isVisible()).toBe(mismatches.length > 0);
-    }
-  }
-  await form.getByRole('radio', { name: 'Says you cover it', exact: true }).check();
-  await expect(result).toBeHidden();
-  await form.getByRole('button', { name: 'Show my next steps' }).click();
-  await result.getByRole('button', { name: 'Check another service or suburb' }).click();
-  await expect(form.locator(':checked')).toHaveCount(0);
-  await expect(result).toBeHidden();
-  await expect(page.getByRole('heading', { name: 'Check one service and suburb' })).toBeFocused();
+  const actions = page.locator('#coverage-actions li');
+  await form.getByRole('button', { name: 'Try the Maylands example' }).click();
+  await expect(actions.nth(0)).toContainText('Also listed: Inglewood.');
+  await expect(actions.nth(1)).toContainText('Also listed: Inglewood.');
+  await expect(actions.nth(2)).toContainText('All entered names match');
+  await expect(page.locator('#coverage-result-summary')).toContainText('Check the quote form first');
+
+  await form.getByLabel('Suburbs you serve for this service').fill('Maylands, bayswater; BAYSWATER');
+  await form.getByLabel('Quote form options').fill('Maylands, Inglewood');
+  await form.getByLabel('Google Business Profile areas').fill('Perth Metro, 6051');
+  await expect(page.locator('#coverage-result')).toBeHidden();
+  await form.getByRole('button', { name: 'Build my coverage update' }).click();
+  await expect(actions.nth(0)).toContainText('Not listed by name: bayswater.');
+  await expect(actions.nth(2)).toContainText('Check whether existing wider areas or postcodes');
+  await expect(actions.nth(2)).toContainText('Keep areas you serve for other services');
+  await expect(page.locator('#coverage-site-copy')).toHaveText('We provide regular house cleaning in Maylands and bayswater.');
+
+  await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText: () => Promise.reject(new Error('Clipboard unavailable')) },
+  }));
+  await page.getByRole('button', { name: 'Copy update plan' }).click();
+  const plain = page.getByRole('textbox', { name: 'Coverage update plan' });
+  await expect(plain).toBeFocused();
+  await expect(plain).toHaveValue(/Website copy[\s\S]*Quote form helper text[\s\S]*Before publishing/);
+  await page.getByRole('button', { name: 'Start another coverage update' }).click();
+  await expect(form.getByLabel('Cleaning service', { exact: true })).toHaveValue('');
+  await expect(form.getByLabel('Cleaning service', { exact: true })).toBeFocused();
+  await expect(page.locator('#coverage-result')).toBeHidden();
+});
+
+test('the footer points to one coverage tool and older tool links reach it', async ({ page }) => {
+  await page.goto('./');
+  const link = page.locator('.site-footer').getByRole('link', { name: 'Coverage checklist' });
+  await expect(link).toHaveCount(1);
+  await link.click();
+  await expect(page).toHaveURL(/coverage-checklist\.html$/);
+  await expect(page.locator('.site-footer a[href$="coverage-checklist.html"]')).toHaveCount(0);
+  await page.goto('quote-form-fixer.html');
+  await expect(page).toHaveURL(/coverage-checklist\.html$/);
+  await expect(page.getByRole('heading', { name: 'Build your coverage update' })).toBeVisible();
 });
 
 for (const [device, width, height, hasTouch] of [

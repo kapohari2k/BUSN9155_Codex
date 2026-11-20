@@ -1,14 +1,14 @@
 # Local Lift measurement plan
 
-## Current integration: 9 November 2026
+## Analytics integration
 
-The website uses GTM container `GTM-PG38VX8P` after consent. The owner has confirmed `form_start` in DebugView and configured the funnel. Live `generate_lead` in standard reports remains unverified. The direct GA4 fallback is selected only when GTM is explicitly disabled. [GTM configuration and verification](gtm-setup.md)
+The website uses GTM container `GTM-PG38VX8P` after consent. The owner confirmed `form_start` in DebugView, `generate_lead` in GA4 reports and a labelled test enquiry in the Formspree inbox. The coverage page, start and completion stages use the existing coverage exploration. [GTM configuration and verification](gtm-setup.md)
 
 ## Objective and boundaries
 
 Help a suitable Perth residential cleaning business owner understand the review, inspect a sample, assess fit and enquire. The independent checklist journey is also useful; a visitor who solves a simple update without enquiring is not automatically a failed visit.
 
-The analytics layer is implemented but **gated by visitor opt-in; the configured GTM container must contain published GA4 tags for collection**. No GA4 property was created or connected during this draft. Local mocked event checks are not collection evidence.
+Analytics requires visitor opt-in. Reported activity reflects visitors who allow measurement. A local test with mocked tags checks browser behaviour. Use the GA4 property to verify collection.
 
 ## Event specification
 
@@ -18,8 +18,8 @@ The analytics layer is implemented but **gated by visitor opt-in; the configured
 | `enquiry_cta_click` | Click a marked enquiry link | Fixed `placement`: `header`, `footer`, `home-hero`, `home-close`, `about-enquiry`, `audit-intro`, `audit-contents`, `audit-close`, `guide-close` | Are suitable next steps visible at useful points? Compare clicks with starts to see where visitors continue. |
 | `sample_select` | Click a marked link to the sample | Fixed `placement`: `home-hero`, `about-sample`, `audit-intro`, `enquire-aside` | Are visitors choosing to inspect the deliverable before deciding? |
 | `guide_select` | Click a marked guide link | Fixed `placement`: `header`, `footer`, `home-guide`, `audit-contents`, `enquire-success` | Is the independent guide being selected? Direct guide landings appear in page views. |
-| `coverage_check_start` | First answer in the guided check on a page load while opted in | Safe page context only | Are checklist visitors starting the guided check? |
-| `coverage_check_complete` | First valid result shown on a page load while opted in | Safe page context only | Are visitors who start reaching the tailored result? |
+| `coverage_check_start` | First edit or use of the example, once per page load while opted in | Safe page context only | Are visitors starting the coverage update? |
+| `coverage_check_complete` | First valid update shown on a page load while opted in | Safe page context only | Are visitors reaching copy and recommendations? |
 | `form_start` | First focus inside the enquiry form on that page load | None | Is the form being started after fit information is available? Not every start should become an enquiry. |
 | `form_error` | A failed submit attempt | One fixed `error_category`: `validation`, `unavailable`, `network`, `service`, `unconfirmed`, `timeout` | Is friction a field issue, deliberate unavailability or a service/connection problem? Fix technical errors before drawing marketing conclusions. |
 | `generate_lead` | Exactly once when Formspree responds with HTTP success **and JSON `ok: true`** | None | Count service-confirmed enquiries as the primary site action. Does not establish inbox delivery, suitability, sales or business results. |

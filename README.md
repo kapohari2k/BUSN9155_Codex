@@ -1,6 +1,6 @@
 # Local Lift
 
-A seven-page static website for the proposed **Website and SEO audit for owner-led Perth residential cleaning businesses**, developed for BUSN9155 Part B. The free Quote Form Fixer turns field labels and a pricing method into a copyable draft in the browser.
+A six-page static website for the proposed **Website and SEO audit for owner-led Perth residential cleaning businesses**, developed for BUSN9155 Part B. The Coverage Checklist drafts service-area wording and optionally compares owner-supplied lists in the browser.
 
 Public GitHub Pages address: **https://kapohari2k.github.io/BUSN9155_Codex/**. The working tree preview shows local changes before publication.
 
@@ -24,7 +24,7 @@ npm run check:dist
 VITE_BASE_PATH=/BUSN9155_Codex/ npm run preview -- --host 127.0.0.1 --port 4173
 ```
 
-Open the preview origin printed by Vite **with `/BUSN9155_Codex/` appended**. Check the audit, sample report, quote form fixer, coverage checklist, About and Enquire pages directly under that directory and refresh them.
+Open the preview origin printed by Vite **with `/BUSN9155_Codex/` appended**. Visit `about.html`, `audit.html`, `coverage-checklist.html` and `enquire.html` directly under that directory and refresh them. This is a local preview, not a public deployment.
 
 PowerShell equivalent for preview:
 
@@ -39,7 +39,7 @@ npm run preview -- --host 127.0.0.1 --port 4173
 base: process.env.VITE_BASE_PATH ?? (command === 'build' ? '/BUSN9155_Codex/' : '/')
 ```
 
-The default output is `dist`. All seven pages are explicit build inputs. Shared navigation, metadata and footer are inserted at build time. Internal links include the project base. Fonts and the SVG favicon use ES module imports and are emitted into `dist/assets` with `assetsInlineLimit: 0`.
+The default output is `dist`. All six pages are explicit build inputs. Shared navigation, metadata and footer are inserted at build time. Internal links include the project base. Fonts and the SVG favicon use ES module imports and are emitted into `dist/assets` with `assetsInlineLimit: 0`.
 
 ## Published enquiry and analytics checks
 

@@ -264,7 +264,7 @@ test('CTA, sample and guide events use only approved placement labels', async ({
   for (const [selector,name,label] of [
     ['.nav-enquire','enquiry_cta_click','header'],
     ['a[data-event="sample"]','sample_select','enquire-aside'],
-    ['#primary-nav a[data-event="guide"]','guide_select','header-quote-fixer'],
+    ['#primary-nav a[data-event="guide"]','guide_select','header'],
   ]) {
     const link = page.locator(selector).first();
     await link.evaluate(element=>element.addEventListener('click',event=>event.preventDefault()));
