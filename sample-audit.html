@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- site:head -->
+  <script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+<!-- site:header -->
+<main id="main" class="container report-page" tabindex="-1">
+  <header class="report-cover">
+    <p class="report-brand">Local Lift</p>
+    <div>
+      <p class="eyebrow">Illustrative report · Fictional business</p>
+      <h1>Sample website and SEO audit report</h1>
+      <p class="report-client">Sample Cleaning · Maylands, Perth</p>
+      <p class="report-lede">Three practical fixes to clarify where a residential cleaner works and make it easier for customers to request a quote.</p>
+    </div>
+    <div class="button-group report-actions">
+      <a class="button" href="@/resources/sample-website-audit-report.pdf" download>Download sample report (PDF, 3 pages)</a>
+      <a class="text-link" href="@/audit.html#suitability">Check if the audit suits your business</a>
+    </div>
+    <div class="report-overview">
+      <section aria-labelledby="summary-heading">
+        <h2 id="summary-heading">Summary and scope</h2>
+        <p>Fix the quote form first. It currently blocks customers who cannot supply the floor area. Next, align suburb information across the website, Google Business Profile and form. Then clarify the title of the regular house cleaning page.</p>
+        <p>This example covers the mobile quote journey, the service-area information and one service page. The business, observations and proposed copy are fictional.</p>
+      </section>
+      <nav aria-labelledby="findings-heading">
+        <h2 id="findings-heading">Findings in order</h2>
+        <ol>
+          <li><a href="#quote-form">Remove a barrier in the quote form</a></li>
+          <li><a href="#service-area">Align the listed service areas</a></li>
+          <li><a href="#service-title">Clarify the service page title</a></li>
+        </ol>
+      </nav>
+    </div>
+  </header>
+
+  <div class="report-sheet">
+    <section class="report-finding" id="quote-form" aria-labelledby="quote-heading">
+      <p class="eyebrow">Finding 01 · High priority</p>
+      <h2 id="quote-heading">Remove a barrier in the quote form</h2>
+      <dl>
+        <div><dt>Observation</dt><dd>The mobile form requires floor area in square metres. A quote request cannot be submitted when the field is blank.</dd></div>
+        <div><dt>Why it comes first</dt><dd>Customers who cannot estimate their floor area are blocked at the point of enquiry.</dd></div>
+        <div><dt>Change and placement</dt><dd>Ask for bedroom and bathroom counts if the owner needs them for an initial quote. Label the existing field <strong>Floor area in square metres (optional)</strong> and add <strong>Leave this blank if you’re unsure.</strong></dd></div>
+        <div><dt>Owner and verification</dt><dd>The owner confirms the minimum quote details. The web contact makes the field optional, submits a labelled phone test with the field blank and checks it reaches the inbox.</dd></div>
+      </dl>
+    </section>
+
+    <section class="report-finding" id="service-area" aria-labelledby="coverage-heading">
+      <p class="eyebrow">Finding 02 · High priority</p>
+      <h2 id="coverage-heading">Align the listed service areas</h2>
+      <dl>
+        <div><dt>Observation</dt><dd>The fictional owner confirms regular cleaning in Maylands and Bayswater. The service page and quote form still list Inglewood, while the Google Business Profile lists Maylands and Bayswater.</dd></div>
+        <div><dt>Why it matters</dt><dd>A customer in Inglewood could reasonably expect to get a quote. Confirming coverage up front avoids an enquiry the owner cannot service.</dd></div>
+        <div><dt>Change and placement</dt><dd>Under the service page’s coverage heading, use <strong>We provide regular house cleaning in Maylands and Bayswater.</strong> Update the quote form’s suburb list and helper text to match.</dd></div>
+        <div><dt>Owner and verification</dt><dd>The owner confirms both suburbs and checks the Google profile. The web contact publishes the website and form updates. Compare all three views and test both served suburbs and the removed option on a phone.</dd></div>
+      </dl>
+      <p class="report-related"><a href="@/coverage-checklist.html#worked-example" data-event="guide" data-placement="report-coverage">Use the coverage checklist’s worked example</a></p>
+    </section>
+  </div>
+
+  <div class="report-sheet">
+    <section class="report-finding" id="service-title" aria-labelledby="title-heading">
+      <p class="eyebrow">Finding 03 · Medium priority</p>
+      <h2 id="title-heading">Clarify the service page title</h2>
+      <dl>
+        <div><dt>Observation</dt><dd>The title is <strong>Services | Sample Cleaning</strong>. The existing Maylands service page describes regular house cleaning, which the title leaves out.</dd></div>
+        <div><dt>Why it matters</dt><dd>A descriptive title helps a customer recognise a relevant result. Google may choose a different title for its search result.</dd></div>
+        <div><dt>Change and placement</dt><dd>Set the SEO title of the existing Maylands page to <strong>Regular House Cleaning in Maylands | Sample Cleaning</strong>. Keep the current URL.</dd></div>
+        <div><dt>Owner and verification</dt><dd>The owner approves the wording. The web contact updates the title and checks the browser tab on the published page.</dd></div>
+      </dl>
+    </section>
+
+    <section class="report-handover" aria-labelledby="handover-heading">
+      <h2 id="handover-heading">Handover and follow-up</h2>
+      <p>The owner confirms the service details and approves the wording. Their web contact publishes the changes. In the walkthrough, we review the evidence, agree the order of changes and confirm who will run each check.</p>
+      <p>After publishing, keep dated notes on the mobile quote test, coverage check and page title. Use later search and enquiry data to assess performance once enough data has accumulated.</p>
+    </section>
+
+    <section class="report-close" aria-labelledby="report-enquiry">
+      <h2 id="report-enquiry">Want an audit for your website?</h2>
+      <p>Share your website and what you’d like reviewed. We’ll reply by email about fit and scope before you decide whether to proceed.</p>
+      <a class="button" href="@/enquire.html#enquiry-form" data-event="enquiry" data-placement="report-close">Enquire about an audit</a>
+    </section>
+  </div>
+</main>
+<!-- site:footer -->
+</body>
+</html>

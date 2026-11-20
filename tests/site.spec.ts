@@ -5,12 +5,13 @@ const pages = [
   { file: '', nav: 'Home', heading: 'Website and SEO audits for Perth cleaners' },
   { file: 'about.html', nav: 'About', heading: 'How Local Lift audits your website' },
   { file: 'audit.html', nav: 'The audit', heading: 'What the website and SEO audit covers' },
+  { file: 'sample-audit.html', nav: null, heading: 'Sample website and SEO audit report' },
   { file: 'coverage-checklist.html', nav: 'Coverage checklist', heading: 'Coverage checklist for Perth cleaners' },
   { file: 'enquire.html', nav: 'Enquire', heading: 'Enquire about an audit' },
 ];
 for (const width of [1440, 768, 390, 320]) {
   for (const item of pages) {
-    test(`${item.nav}: direct visit, assets, layout and accessibility at ${width}px`, async ({ page }) => {
+    test(`${item.nav ?? "Sample audit report"}: direct visit, assets, layout and accessibility at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       const errors: string[] = [];
       const failed: string[] = [];
@@ -24,7 +25,9 @@ for (const width of [1440, 768, 390, 320]) {
       await expect(page.locator('main')).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
       if (width <= 800) await page.getByRole('button', { name: 'Menu', exact: true }).click();
-      await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: item.nav, exact: true })).toHaveAttribute('aria-current', 'page');
+      const nav = page.getByRole('navigation', { name: 'Main navigation' });
+      if (item.nav) await expect(nav.getByRole('link', { name: item.nav, exact: true })).toHaveAttribute('aria-current', 'page');
+      else await expect(nav.locator('[aria-current=page]')).toHaveCount(0);
       const result = await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();
       expect(result.violations, JSON.stringify(result.violations, null, 2)).toEqual([]);
       await page.reload();
@@ -286,12 +289,13 @@ for (const [device, width, height, hasTouch] of [
       }
 
       await page.goto('./');
-      await page.locator('main a[href$="audit.html#sample"]').first()[tap]();
-      await expect(page).toHaveURL(/audit\.html#sample$/);
+      await page.getByRole('link', { name: 'See a sample report' })[tap]();
+      await expect(page).toHaveURL(/sample-audit\.html$/);
+      await expect(page.getByRole('link', { name: /Download sample report/ })).toHaveAttribute('download', '');
       await page.locator('main a[data-event="enquiry"]').first()[tap]();
       await assertLanding();
       await page.goBack();
-      await expect(page).toHaveURL(/audit\.html#sample$/);
+      await expect(page).toHaveURL(/sample-audit\.html$/);
       await page.goForward();
       await assertLanding();
       await page.reload();

@@ -1,6 +1,7 @@
 import './styles.css';
 import './service.css';
 import './navigation.css';
+import './report.css';
 import sansUrl from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
 import serifUrl from '@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url';
 import italicUrl from '@fontsource-variable/newsreader/files/newsreader-latin-wght-italic.woff2?url';

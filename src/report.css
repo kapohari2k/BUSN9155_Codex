@@ -1,0 +1,152 @@
+.report-preview {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(14px, 3vw, 30px);
+  padding: clamp(18px, 3vw, 34px);
+  background: #e9ede2;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.report-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  box-shadow: 5px 7px 0 #ced6c6;
+}
+
+.report-preview h2 {
+  font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+}
+
+.report-preview p {
+  margin-bottom: 0;
+  font-size: .92rem;
+}
+
+.report-page {
+  max-width: 900px;
+  margin-block: clamp(30px, 6vw, 76px);
+}
+
+.report-cover {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--ink);
+  padding: clamp(20px, 5vw, 55px);
+}
+
+.report-brand {
+  margin-bottom: clamp(22px, 5vw, 54px);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.report-cover h1 {
+  max-width: 15ch;
+  font-size: clamp(2.55rem, 7vw, 5rem);
+  overflow-wrap: anywhere;
+}
+
+.report-client {
+  margin-bottom: .65rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.report-lede {
+  max-width: 50ch;
+  font-size: 1.1rem;
+}
+
+.report-overview {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 28px;
+  margin-top: 32px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+}
+
+.report-overview h2,
+.report-finding h2,
+.report-handover h2,
+.report-close h2 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.report-overview ol {
+  padding-left: 1.4em;
+}
+
+.report-overview li + li {
+  margin-top: .6em;
+}
+
+.report-page a:not(.button) {
+  text-underline-offset: .2em;
+}
+
+.report-finding,
+.report-handover,
+.report-close {
+  margin-top: 28px;
+  padding: clamp(20px, 5vw, 48px);
+  border: 1px solid var(--line);
+}
+
+.report-finding dl {
+  margin: 0;
+}
+
+.report-finding dl div {
+  display: grid;
+  grid-template-columns: minmax(9em, 1fr) 3fr;
+  gap: 4px 20px;
+  padding-block: 13px;
+  border-top: 1px solid var(--line);
+}
+
+.report-finding dt {
+  font-weight: 750;
+}
+
+.report-finding dd {
+  margin: 0;
+}
+
+.report-related {
+  margin-bottom: 0;
+}
+
+.report-close {
+  background: #e9ede2;
+}
+
+@media (max-width: 620px) {
+  .report-overview,
+  .report-finding dl div {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  @page audit-report { size: A4; margin: 16mm 17mm; }
+  .report-page { page: audit-report; margin: 0; max-width: none; font-size: 10pt; line-height: 1.5; }
+  .report-cover { padding: 10mm; min-height: 225mm; }
+  .report-cover h1 { font-size: 45pt !important; }
+  .report-client, .report-lede { font-size: 12pt; }
+  .report-overview { display: block; margin-top: 10mm; padding-top: 6mm; }
+  .report-overview nav { margin-top: 6mm; }
+  .report-brand { margin-bottom: 24mm; }
+  .report-sheet { break-before: page; }
+  .report-finding, .report-handover, .report-close { margin: 0 0 5mm; padding: 5mm 6mm; break-inside: avoid; }
+  .report-finding h2, .report-overview h2, .report-handover h2, .report-close h2 { font-size: 19pt; }
+  .report-finding dl div { grid-template-columns: 28mm 1fr; padding-block: 2.1mm; }
+  .report-page a[href]::after { content: none; }
+  .report-close .button { color: white; }
+}

@@ -2,7 +2,7 @@ import './consent.css';
 import { analyticsConfig, analyticsStorageKey as storageKey } from './analytics-config';
 
 type EventName = 'enquiry_cta_click' | 'sample_select' | 'guide_select' | 'form_start' | 'form_error' | 'generate_lead';
-const allowedLabels = ['header', 'footer', 'home-hero', 'home-guide', 'home-close', 'about-sample', 'about-guide', 'about-enquiry', 'audit-intro', 'audit-contents', 'audit-close', 'guide-close', 'enquire-aside', 'enquire-success'] as const;
+const allowedLabels = ['header', 'footer', 'home-hero', 'home-guide', 'home-close', 'about-sample', 'about-guide', 'about-enquiry', 'audit-intro', 'audit-report', 'audit-contents', 'audit-close', 'guide-close', 'enquire-aside', 'enquire-success', 'report-coverage', 'report-close'] as const;
 type SafeLabel = typeof allowedLabels[number];
 export type ErrorCategory = 'validation' | 'unavailable' | 'network' | 'service' | 'unconfirmed' | 'timeout';
 type EventParameters = { placement?: SafeLabel; error_category?: ErrorCategory };
@@ -18,7 +18,7 @@ let tagReady = false;
 let pageViewSent = false;
 let pendingConsent: Record<string, string> | undefined;
 const pendingEvents: { name: EventName; parameters: EventParameters }[] = [];
-const knownPages = new Set(['index.html','about.html','audit.html','coverage-checklist.html','enquire.html']);
+const knownPages = new Set(['index.html','about.html','audit.html','sample-audit.html','coverage-checklist.html','enquire.html']);
 
 function safePageLocation(): string {
   const file = location.pathname.split('/').pop() || 'index.html';
