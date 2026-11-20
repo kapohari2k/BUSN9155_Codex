@@ -53,7 +53,12 @@
   text-decoration: underline;
 }
 
-.home-intro-video video {
+.sample-intro {
+  max-width: 46ch;
+  margin-top: 1rem;
+}
+
+.audit-intro-video video {
   display: block;
   width: 100%;
   height: auto;
@@ -62,9 +67,17 @@
   border-radius: var(--radius);
 }
 
-.home-intro-video video:focus-visible {
+.audit-intro-video video:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 3px;
+}
+
+.audit-intro-video .text-link {
+  margin-top: .85rem;
+}
+
+.audit-intro-video .caption {
+  margin: .75rem 0;
 }
 
 .intro-video-transcript summary {

@@ -26,7 +26,11 @@ for (const page of pages) {
   for (const [link] of html.matchAll(/<a\b[^>]*\bdata-event="enquiry"[^>]*>/g)) {
     assert.equal(link.match(/\bhref="([^"]+)"/)?.[1], `${base}enquire.html#enquiry-form`, `${page}: enquiry CTA targets the form`);
   }
-  if (page === 'index.html') hasIntroVideo = html.includes('class="intro-video-transcript"');
+  if (html.includes('class="intro-video-transcript"')) {
+    assert.equal(page, 'audit.html', 'intro video belongs on the Audit page');
+    assert.ok(html.includes('>View the sample audit</a>'), 'intro video links to the sample report');
+    hasIntroVideo = true;
+  }
   for (const match of html.matchAll(/(?:href|src|poster)="([^"]+)"/g)) {
     const url = match[1];
     if (url.startsWith('#') || /^https?:/.test(url)) continue;
