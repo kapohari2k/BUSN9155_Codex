@@ -25,11 +25,11 @@
       <h2 id="coverage-check-heading" tabindex="-1">Build your coverage update</h2>
       <p>Choose one cleaning service and enter the suburbs you serve. Get wording for your website and quote form, plus the checks to make before publishing.</p>
     </div>
-    <form id="coverage-check-form" autocomplete="off" novalidate>
+    <div id="coverage-check-form" role="form" aria-labelledby="coverage-check-heading">
       <div class="coverage-inputs">
         <div>
           <label for="coverage-service">Cleaning service</label>
-          <input id="coverage-service" type="text" maxlength="75" required placeholder="e.g. Regular house cleaning" aria-describedby="coverage-service-error">
+          <input id="coverage-service" type="text" maxlength="75" autocomplete="off" required placeholder="e.g. Regular house cleaning" aria-describedby="coverage-service-error">
           <p id="coverage-service-error" class="coverage-error" hidden></p>
         </div>
         <div>
@@ -64,11 +64,11 @@
         </div>
       </details>
       <div class="button-group">
-        <button type="submit" class="button">Build my coverage update</button>
+        <button type="button" class="button" id="coverage-build">Build my coverage update</button>
         <button type="button" class="text-link" id="coverage-example">Try the Maylands example</button>
       </div>
       <p class="coverage-note">Entries stay in your browser.</p>
-    </form>
+    </div>
 
     <section id="coverage-result" class="coverage-result" aria-labelledby="coverage-result-heading" hidden>
       <div class="coverage-result-head">

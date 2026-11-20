@@ -55,7 +55,7 @@
 }
 
 .coverage-error { color: #a1312b; font-weight: 750; }
-.coverage-check form > .coverage-note { margin-top: .8rem; }
+#coverage-check-form > .coverage-note { margin-top: .8rem; }
 .coverage-check .text-link { min-height: 44px; text-decoration: underline; }
 
 .coverage-compare { margin: 1rem 0; }

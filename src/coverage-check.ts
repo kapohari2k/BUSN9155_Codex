@@ -1,7 +1,7 @@
 import './coverage-check.css';
 import { track } from './analytics';
 
-const form = document.querySelector<HTMLFormElement>('#coverage-check-form')!;
+const form = document.querySelector<HTMLElement>('#coverage-check-form')!;
 const service = document.querySelector<HTMLInputElement>('#coverage-service')!;
 const suburbs = document.querySelector<HTMLTextAreaElement>('#coverage-suburbs')!;
 const comparison = document.querySelector<HTMLDetailsElement>('#coverage-compare')!;
@@ -78,8 +78,7 @@ for (const input of [service, suburbs, ...channels.map(channel => channel.input)
   });
 }
 
-form.addEventListener('submit', event => {
-  event.preventDefault();
+function buildUpdate(): void {
   const serviceName = service.value.trim().replace(/\s+/g, ' ').replace(/[.!?]+$/, '');
   const wanted = areaNames(suburbs.value);
   const observations = channels.map(channel => areaNames(channel.input.value));
@@ -151,6 +150,14 @@ form.addEventListener('submit', event => {
     completed = true;
     track('coverage_check_complete');
   }
+}
+
+document.getElementById('coverage-build')!.addEventListener('click', buildUpdate);
+service.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.isComposing) {
+    event.preventDefault();
+    buildUpdate();
+  }
 });
 
 document.getElementById('coverage-example')!.addEventListener('click', () => {
@@ -160,7 +167,7 @@ document.getElementById('coverage-example')!.addEventListener('click', () => {
   channels[1].input.value = 'Maylands, Bayswater, Inglewood';
   channels[2].input.value = 'Maylands, Bayswater';
   comparison.open = true;
-  form.requestSubmit();
+  buildUpdate();
 });
 
 document.getElementById('coverage-copy')!.addEventListener('click', async () => {
@@ -176,8 +183,10 @@ document.getElementById('coverage-copy')!.addEventListener('click', async () => 
 });
 
 document.getElementById('coverage-restart')!.addEventListener('click', () => {
-  form.reset();
-  for (const input of [service, suburbs, ...channels.map(channel => channel.input)]) setError(input, '');
+  for (const input of [service, suburbs, ...channels.map(channel => channel.input)]) {
+    input.value = '';
+    setError(input, '');
+  }
   comparison.open = false;
   result.hidden = true;
   service.focus();

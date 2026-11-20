@@ -22,6 +22,8 @@ test('guided coverage events require consent and contain only safe page context'
   };
 
   await page.goto('coverage-checklist.html');
+  // GA4 Enhanced Measurement watches native forms. Only Enquire should match.
+  await expect(page.locator('main form')).toHaveCount(0);
   await decline(page).click();
   await finishCheck();
   expect(containerLoads).toBe(0);
@@ -43,6 +45,8 @@ test('guided coverage events require consent and contain only safe page context'
     page_title: await page.title(),
     page_referrer: '',
   };
+  const globalSettings = await page.evaluate(() => window.dataLayer?.map(entry => Array.from(entry as ArrayLike<unknown>)).find(call => call[0] === 'set'));
+  expect(globalSettings).toEqual(['set', contextFields]);
   expect(events).toEqual([
     { event: 'coverage_check_start', ...contextFields },
     { event: 'coverage_check_complete', ...contextFields },
@@ -122,6 +126,9 @@ test('mocked GTM stays silent until consent and stops after cross-tab withdrawal
   });
   const eventCount = (name: string) => transport.filter(url => url.searchParams.get('event') === name).length;
   await page.goto('enquire.html?email=example%40example.com#enquiry-form');
+  // Enhanced Measurement reads the native form action separately from page_location.
+  const destination = await page.locator('#enquiry-details').evaluate((form: HTMLFormElement) => form.action);
+  expect(destination).toBe('http://127.0.0.1:4173/BUSN9155_Codex/enquire.html');
   expect(scripts).toEqual([]);
   expect(transport).toEqual([]);
   await decline(page).click();

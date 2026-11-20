@@ -50,7 +50,9 @@ function startAnalytics(): void {
   pendingConsent = consent(true);
   window.gtag('consent', 'default', pendingConsent);
   if (useGtm) {
-    // The Google tag can read safe page context on startup, before the manual page_view.
+    // Apply safe page context to automatic Google tag events as well as site events.
+    window.gtag('set', context);
+    // The container can also read these values as data layer variables.
     window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js', ...context });
   } else {
     window.gtag('js', new Date());
